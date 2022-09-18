@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:49:20 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/17 14:10:20 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 19:52:03 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ class Message
 	public:
 
 		Message(int const & fd, char const * input);
+		Message(int const & fd, std::string const & input);
 		Message(Message const & other);
 		Message const & operator=(Message const & rhs);
 		~Message(void);
@@ -30,6 +31,7 @@ class Message
 		int get_len(void) const;
 		char const * get_raw(void) const;
 		std::string const & get_receiver(void) const;
+		std::string const & get_postfix(void) const;
 		bool	receiver_is_channel(void) const;
 		std::string const & get_arg(void) const;
 

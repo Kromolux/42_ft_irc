@@ -3,16 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 15:50:55 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/16 14:21:30 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 11:08:58 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //socket
 #include <cstdlib>
 #include <cctype>
+#include <signal.h>
+#include "Server.hpp"
+
+bool server_run = true;
 
 bool	isInt(char *userInput)
 {
@@ -24,7 +28,17 @@ bool	isInt(char *userInput)
 	return (true);
 }
 
-#include "Server.hpp"
+
+void	sigint(int sign)
+{
+	if (sign == SIGINT)
+	{
+		server_run = false;
+		std::cout << "SIGINT signal handler called!\n";
+	}
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -38,10 +52,12 @@ int main(int argc, char **argv)
 		std::cout << "Invalid port as first argument!\n 1024 - 65535\n";
 		exit(-1);
 	}
-
+	signal(SIGINT, &sigint);
 	Server IRC_Server(std::atoi(argv[1]), argv[2]);
 	IRC_Server.init_server();
-	IRC_Server.start_server();
+	while (server_run)
+		IRC_Server.run_server();
+	IRC_Server.stop_server();
 	//struct addrinfo hints, result;
 	// struct sockaddr_in serverAddress;
 	// serverAddress.sin_family = AF_INET;

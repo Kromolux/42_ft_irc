@@ -6,16 +6,17 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 20:03:27 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:40:34 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Message.hpp"
 
-Message::Message(int const & fd, std::string const & input)
+Message::Message(int const & fd, std::string const & input, std::string const & receiver)
 {
 	this->fd = fd;
 	this->raw = input;
+	this->receiver = receiver;
 }
 
 Message::Message(int const & fd, char const * input)
@@ -82,7 +83,7 @@ void	Message::parse(void)
 	{
 		++start_pos;
 		diff = end_pos - start_pos;
-		this->postfix = tmp.substr(start_pos, diff);
+		this->postfix = tmp.substr(start_pos);
 	}
 	// if (tmp[0] == ':')
 	// {

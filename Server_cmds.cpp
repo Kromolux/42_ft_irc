@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 21:29:34 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 23:00:36 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,12 @@ void	Server::JOIN(Message const & message)
 {
 	//validity check for channel name
 	std::map<std::string, Channel>::iterator channel = channel_list.find(message.get_arg());
-	if (channel != channel_list.end())
-		channel->second.add_member(message.get_fd());
-	else
+	if (channel == channel_list.end())
+	{
 		channel_list.insert(std::make_pair(message.get_arg(), Channel(message.get_arg(), message.get_fd())));
+		channel = channel_list.find(message.get_arg());
+	}
+	channel->second.add_member(message.get_fd());
 	//check if channel exists
 	//add client to channel member list
 	//successfully joined a channel server reponse the user in the channel.
@@ -56,16 +58,22 @@ void	Server::JOIN(Message const & message)
 	std::string user = client_list.find(message.get_fd())->second.get_username();
 	std::string host = client_list.find(message.get_fd())->second.get_hostname();
 	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " :" + message.get_arg() + "\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
+	send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
 	std::set<int> member_list = channel_list.find(message.get_arg())->second.get_member_list();
 	std::string list = create_member_list_string(client_list, member_list);
 	standard_message(message, "365", "= " + message.get_arg(), list);
-	standard_message(message, "366", message.get_arg() + " " + " :End of /NAMES list.");
+	standard_message(message, "366", message.get_arg(), "End of /NAMES list.");
 }
 
 void	Server::PRIVMSG(Message const & message)
 {
-	not_implemented_yes(message);
+	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
+	std::string user = client_list.find(message.get_fd())->second.get_username();
+	std::string host = client_list.find(message.get_fd())->second.get_hostname();
+	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " :" + message.get_postfix() + "\r\n";
+	std::map<std::string, Channel>::iterator channel = channel_list.find(message.get_arg());
+	if (channel != channel_list.end())
+		send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
 }
 
 void	Server::PING(Message const & message)

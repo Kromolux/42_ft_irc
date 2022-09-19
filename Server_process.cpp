@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 21:12:33 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:30:26 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,6 @@ void	Server::standard_message(Message const & message, std::string const & code,
 void	Server::standard_message(Message const & message, std::string const & code, std::string const & text, std::string const & postfix)
 {
 	std::string nickname = client_list.find(message.get_fd())->second.get_nickname();
-	std::string tmp = ":" + server_name + " " + code + " " + nickname +  " " + text + ":" + postfix + "\r\n";
+	std::string tmp = ":" + server_name + " " + code + " " + nickname +  " " + text + " :" + postfix + "\r\n";
 	send_message_queue.push(Message(message.get_fd(), tmp));
 }

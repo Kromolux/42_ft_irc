@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:49:20 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 19:52:03 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:36:08 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ class Message
 	public:
 
 		Message(int const & fd, char const * input);
-		Message(int const & fd, std::string const & input);
+		Message(int const & fd, std::string const & input, std::string const & receiver = "");
 		Message(Message const & other);
 		Message const & operator=(Message const & rhs);
 		~Message(void);

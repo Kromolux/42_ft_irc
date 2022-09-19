@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 21:46:36 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/19 08:41:00 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,20 +62,10 @@ void	Server::init_server(void)
 	
 	int returnListen = listen(serverSocket, 5);
 	std::cout << "listen = " << returnListen << "\n";
-	
-	//std::memset(&client, 0, sizeof(client));
-	// this->Clients.insert(Client("rene"));
-	// std::cout << "size of Clients: " << this->Clients.size() << "\n";
-	// std::set<Client>::iterator it;
-	// it = this->Clients.find(Client("rene"));
-	// if (it != this->Clients.end())
-	// 	std::cout << "found client: " << it->get_nickname() << "\n";
 }
 
 void	Server::run_server(void)
 {
-	// while (true)
-	// {
 		returnAccept = accept(this->serverSocket, (struct sockaddr *) &client, &client_number);
 		if (returnAccept > 0)
 		{
@@ -84,10 +74,7 @@ void	Server::run_server(void)
 			this->add_new_client(returnAccept);
 			this->update_pollfd();
 		}
-		// else if (returnAccept == -1)
-		// {
-		// 	std::cerr << "accept error = " << errno << "\n";
-		// }
+
 		returnPoll = poll(clients, clients_size, 500);
 		if (returnPoll > 0)
 		{
@@ -101,7 +88,7 @@ void	Server::run_server(void)
 			if (clients_size != static_cast<int>(client_list.size()))
 				this->update_pollfd();
 		}
-	// }
+
 }
 
 void	Server::stop_server(void)
@@ -114,7 +101,7 @@ void	Server::update_pollfd(void)
 {
 	std::map<int, Client>::iterator it = client_list.begin();
 	clients_size = static_cast<int>(client_list.size());
-	for (int i = 0; i < clients_size; ++i)
+	for (int i = 0; i < clients_size; ++i, ++it)
 	{
 		clients[i].fd = it->first;
 		clients[i].events = POLLIN;
@@ -165,7 +152,8 @@ void	Server::remove_message(int const & fd)
 std::string const Server::create_member_list_string(std::map<int, Client> const & client_list, std::set<int> const & member_list)
 {
 	std::string tmp;
-	for (int i = 0, end = member_list.size(); i < end; ++i)
-		tmp = tmp + " " + client_list.find(*member_list.find(i))->second.get_nickname();
+	std::set<int>::iterator it = member_list.begin();
+	for (int i = 0, end = member_list.size(); i < end; ++i, ++it)
+		tmp = tmp + client_list.find(*it)->second.get_nickname() + " ";
 	return (tmp);
 }

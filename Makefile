@@ -6,7 +6,7 @@
 #    By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/18 17:09:43 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/09/18 22:00:03 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ SRCS		:=	main.cpp \
 
 OBJS		:=	$(SRCS:%.cpp=%.o)
 
-CFLAGS		=	-Wall -Wextra -Werror -std=c++98
+CFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 DFLAG		:=	-g -D DEBUG=1
 
 PORT		:=	6667

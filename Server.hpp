@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 21:28:35 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 11:43:10 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,9 @@ class Server{
 		int			port;
 		std::string	password;
 		std::string hostname;
+		std::string	version;
+		std::string	user_modes;
+		std::string	channel_modes;
 		std::string motd;
 		//clients in a map?
 		std::map<int, Client> client_list;
@@ -78,6 +81,7 @@ class Server{
 		void	update_pollfd(void);
 		int		get_client_fd(std::string const & nickname);
 		void	add_new_client(int const & fd);
+		void	register_client(Message const & message);
 		void	remove_client(int const & fd);
 		void	store_message(int const & fd, char const * input);
 		void	remove_message(int const & fd);
@@ -97,6 +101,7 @@ class Server{
 		void	JOIN(Message const & message);
 		void	PRIVMSG(Message const & message);
 		void	PING(Message const & message);
+		void	PONG(Message const & message);
 		void	AWAY(Message const & message);
 		void	PART(Message const & message);
 		void	WHOIS(Message const & message);

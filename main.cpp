@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 15:50:55 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/19 08:39:48 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 11:15:39 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,19 @@ int main(int argc, char **argv)
 {
 	if (argc != 3)
 	{
-		std::cout << "Invalid number of arguments!\n <port> <password>\n";
-		exit(-1);
+		std::cerr << "Invalid number of arguments!\n <port> <password>\n";
+		return (EXIT_FAILURE);
 	}
 	if (isInt(argv[1]) == false)
 	{
-		std::cout << "Invalid port as first argument!\n 1024 - 65535\n";
-		exit(-1);
+		std::cerr << "Invalid port as first argument!\n 0 - 65535\n";
+		return (EXIT_FAILURE);
+	}
+	int port = std::atoi(argv[1]);
+	if (port < 0 || port > 65535)
+	{
+		std::cerr << "Invalid port number!\n 0 - 65535\n";
+		return (EXIT_FAILURE);
 	}
 	signal(SIGINT, &sigint);
 	Server IRC_Server(std::atoi(argv[1]), argv[2]);

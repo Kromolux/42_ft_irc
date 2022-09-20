@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 17:06:54 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 11:37:57 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,26 @@ void	Server::store_message(int const & fd, char const * input)
 {
 	std::string tmp = input;
 	size_t start_pos = 0, end_pos = 0;
+	size_t	end_r = 0, end_n = 0, end_rn = 0;
 	std::map<int, Client>::iterator it = client_list.find(fd);
 	do
 	{
-		end_pos = tmp.find("\r\n", start_pos);
+		end_rn = tmp.find("\r\n", start_pos); // || \r || \n || \r\n
+		if (end_rn != std::string::npos)
+			end_pos = end_rn;
+		else
+		{
+			end_r = tmp.find("\r", start_pos);
+			if (end_r != std::string::npos)
+				end_pos = end_r;
+			else
+			end_n = tmp.find("\n", start_pos);
+			if (end_n != std::string::npos)
+				end_pos = end_n;
+			else
+				end_pos = std::string::npos;
+		}
+		
 		if (end_pos == std::string::npos) //incomplete message
 			it->second.append_message_buffer(tmp);
 		else

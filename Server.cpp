@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/19 08:41:00 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 11:28:29 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ Server::Server(int const & port, char const * password)
 	this->password = password;
 	this->server_name = "42_ft_irc";
 	this->motd = "Welcome to our IRC server.";
+	this->version = "0.0.1";
+	this->user_modes = "nothing!";
+	this->channel_modes = "nothing!";
 }
 
 Server::Server(Server const & other) :hostname(other.hostname)
@@ -69,13 +72,13 @@ void	Server::run_server(void)
 		returnAccept = accept(this->serverSocket, (struct sockaddr *) &client, &client_number);
 		if (returnAccept > 0)
 		{
-			std::cout << "accept = " << returnAccept << " client = " << ntohs(client.sin_port) << " - " << client.sin_family <<"\n";
-			//			<< client.sin_addr.s_addr << "\n";
+			std::cout << "accept = " << returnAccept << " client = " << ntohs(client.sin_port) << " - " << client.sin_family <<"\n"
+						<< inet_ntoa(client.sin_addr) << "\n";
 			this->add_new_client(returnAccept);
 			this->update_pollfd();
 		}
 
-		returnPoll = poll(clients, clients_size, 500);
+		returnPoll = poll(clients, clients_size, 0);
 		if (returnPoll > 0)
 		{
 			std::cout << "===< collect messages >===\n";
@@ -88,7 +91,6 @@ void	Server::run_server(void)
 			if (clients_size != static_cast<int>(client_list.size()))
 				this->update_pollfd();
 		}
-
 }
 
 void	Server::stop_server(void)
@@ -120,6 +122,37 @@ int	Server::get_client_fd(std::string const & nickname)
 			return (it->first);
 	}
 	return (-1);
+}
+
+/*
+
+
+001 "Welcome to the Internet Relay Network <nick>!<user>@<host>"
+002 "Your host is <servername>, running version <ver>"
+003 "This server was created <date>"
+004 "<servername> <version> <available user modes> <available channel modes>"
+
+:42.ft_irc.local 001 Rene :Welcome to the debian Internet Relay Chat Network Rene!Rene@127.0.0.1
+:42.ft_irc.local 002 Rene :Your host is 42.ft_irc.local[0.0.0.0/6667], running version hybrid-1:8.2.26+dfsg.1-1
+:42.ft_irc.local 003 Rene :This server was created September 1 2019 at 11:18:31+0000
+:42.ft_irc.local 004 Rene 42.ft_irc.local hybrid-1:8.2.26+dfsg.1-1 DFGHXRSWabcdefgijklnopqrsuwy bchiklmnoprstuveCILMNORST bkloveIh
+*/
+void	Server::register_client(Message const & message)
+{
+	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
+	std::string user = client_list.find(message.get_fd())->second.get_username();
+	std::string host = client_list.find(message.get_fd())->second.get_hostname();
+	std::string tmp = nick + "!" + user + "@" + host + "\r\n";
+	standard_message(message, "001", tmp);
+	
+	tmp = "Your host is " + this->hostname + ", running version " + this->version + "\r\n";
+	standard_message(message, "002", tmp);
+	
+	tmp = "This server was created September 2022\r\n";
+	standard_message(message, "003", tmp);
+
+	tmp = this->hostname + " " + this->version + " " + this->user_modes + " " + this->channel_modes + "\r\n";
+	standard_message(message, "004", tmp);
 }
 
 void	Server::add_new_client(int const & fd)

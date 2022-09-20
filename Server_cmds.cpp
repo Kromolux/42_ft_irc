@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 23:00:36 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 11:42:43 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ void	Server::USER(Message const & message)
 	//not_implemented_yes(message);
 	client_list.find(message.get_fd())->second.set_realname(message.get_postfix());
 	client_list.find(message.get_fd())->second.set_username(message.get_arg());
+	//check for successfull registration
+	register_client(message);
 }
 
 void	Server::JOIN(Message const & message)
@@ -79,6 +81,12 @@ void	Server::PRIVMSG(Message const & message)
 void	Server::PING(Message const & message)
 {
 	std::string tmp = ":" + server_name + " PONG " + server_name + " :" + message.get_arg() + "\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
+}
+
+void	Server::PONG(Message const & message)
+{
+	std::string tmp = ":" + server_name + " PING " + server_name + " :" + message.get_arg() + "\r\n";
 	send_message_queue.push(Message(message.get_fd(), tmp));
 }
 

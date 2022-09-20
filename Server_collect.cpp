@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_collect.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:37:57 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 16:25:08 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	Server::store_message(int const & fd, char const * input)
 			tmp.erase(start_pos, end_pos + 2);
 			received_message_queue.push(Message(fd, it->second.get_message_buffer().c_str()));
 			it->second.clear_message_buffer();
-			start_pos = end_pos + 2;
+			start_pos = 0;
 		}
 	} while (end_pos != std::string::npos);
 	

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 16:14:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 21:03:34 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 16:11:15 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ class Client
 		void		append_message_buffer(char const * input);
 		void		append_message_buffer(std::string const & input);
 		std::string const & get_message_buffer(void) const;
+		void		set_succesfully_reg(bool const & succesfully_reg);
+		bool		const & get_succesfully_reg(void) const;
+
 	
 	private:
 		int	fd;
@@ -45,4 +48,5 @@ class Client
 		std::string	realname;
 		std::string	hostname;
 		std::string	message_buffer;
+		bool		succesfully_reg;
 };

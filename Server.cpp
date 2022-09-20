@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:28:29 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 16:10:29 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,8 @@ void	Server::register_client(Message const & message)
 
 	tmp = this->hostname + " " + this->version + " " + this->user_modes + " " + this->channel_modes + "\r\n";
 	standard_message(message, "004", tmp);
+	MOTD(message);
+
 }
 
 void	Server::add_new_client(int const & fd)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:42:43 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 16:06:08 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,17 @@ void	Server::NICK(Message const & message)
 	{
 		std::map<int, Client>::iterator it = client_list.find(message.get_fd());
 		it->second.set_nickname(message.get_arg());
+		if (it->second.get_username() != "")
+		{
+			it->second.set_succesfully_reg(true);
+			register_client(message);
+		}
 		//create success respond message to sender
 	}
-	//else
-		//create fail respond message to sender
+	else
+	{
+		standard_message(message, "xxx", "= " + message.get_arg(), "Error: Nickname already registered!");
+	}
 	//set nickname
 	
 }
@@ -36,11 +43,25 @@ void	Server::NICK(Message const & message)
 //USER <username> <hostname> <servername> :<realname>
 void	Server::USER(Message const & message)
 {
-	//not_implemented_yes(message);
-	client_list.find(message.get_fd())->second.set_realname(message.get_postfix());
-	client_list.find(message.get_fd())->second.set_username(message.get_arg());
-	//check for successfull registration
-	register_client(message);
+	std::map<int, Client>::iterator it = client_list.find(message.get_fd());
+	if (it->second.get_succesfully_reg() == false)
+	{
+		//not_implemented_yes(message);
+		client_list.find(message.get_fd())->second.set_realname(message.get_postfix());
+		client_list.find(message.get_fd())->second.set_username(message.get_arg());
+		//check for successfull registration
+		// register_client(message);
+		if (it->second.get_nickname() != "")
+		{
+			it->second.set_succesfully_reg(true);
+			register_client(message);
+		}
+	}
+	else
+	{
+		standard_message(message, "zzz", "= " + message.get_arg(), "Error: User already registered!");
+	}
+	
 }
 
 void	Server::JOIN(Message const & message)

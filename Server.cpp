@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 17:28:37 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 00:39:24 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ Server::Server(int const & port, char const * password)
 {
 	this->port = port;
 	this->password = password;
-	this->server_name = "42_ft_irc";
-	this->motd = "Welcome to our IRC server.";
-	this->version = "0.0.1";
-	this->user_modes = "nothing!";
-	this->channel_modes = "nothing!";
+	this->server_name = "42.ft_irc";
+	this->motd = "Welcome to our 42 Wolfsburg IRC server.";
+	this->version = "ver. 0.0.1";
+	this->user_modes = "no user modes";
+	this->channel_modes = "no channel modes";
 }
 
 Server::Server(Server const & other) :hostname(other.hostname)
@@ -40,7 +40,6 @@ Server::~Server(void)
 	std::cout << "good bye!\n";
 }
 
-
 void	Server::init_server(void)
 {
 	clients_size = 0;
@@ -51,13 +50,14 @@ void	Server::init_server(void)
 	this->serverSocket = socket(server_address.sin_family, SOCK_STREAM, 0);
 	this->client_number = sizeof(client);
 	std::cout << "socket = " << serverSocket << "\n";
+
 	int enable = 1;
-	
 	int returnset = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 	std::cout << "setsockopt = " << returnset << "\n";
-		if (returnset < 0)
+	if (returnset < 0)
 	{
-		std::cout << "error " << errno << "\n";
+		std::cerr << "error " << errno << "\n";
+		std::cerr << strerror(errno) << "\n";
 	}
 	
 	int returnBind = bind(serverSocket, (struct sockaddr *) &server_address, sizeof(server_address));
@@ -65,6 +65,7 @@ void	Server::init_server(void)
 	if (returnBind < 0)
 	{
 		std::cout << "error " << errno << "\n";
+		std::cerr << strerror(errno) << "\n";
 		exit(-1);
 	}
 
@@ -82,7 +83,7 @@ void	Server::run_server(void)
 		{
 			std::cout << "accept = " << returnAccept << " client = " << ntohs(client.sin_port) << " - " << client.sin_family <<"\n"
 						<< inet_ntoa(client.sin_addr) << "\n";
-			this->add_new_client(returnAccept);
+			this->client_list.insert(std::make_pair(returnAccept, Client(returnAccept)));
 			this->update_pollfd();
 		}
 
@@ -129,12 +130,15 @@ int	Server::get_client_fd(std::string const & nickname)
 		if (it->second.get_nickname() == nickname)
 			return (it->first);
 	}
-	return (-1);
+	return (0);
+}
+
+bool	Server::is_nick_available(std::string const & nick)
+{
+	return (!get_client_fd(nick));
 }
 
 /*
-
-
 001 "Welcome to the Internet Relay Network <nick>!<user>@<host>"
 002 "Your host is <servername>, running version <ver>"
 003 "This server was created <date>"
@@ -145,58 +149,34 @@ int	Server::get_client_fd(std::string const & nickname)
 :42.ft_irc.local 003 Rene :This server was created September 1 2019 at 11:18:31+0000
 :42.ft_irc.local 004 Rene 42.ft_irc.local hybrid-1:8.2.26+dfsg.1-1 DFGHXRSWabcdefgijklnopqrsuwy bchiklmnoprstuveCILMNORST bkloveIh
 */
-void	Server::register_client(Message const & message)
-{
-	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
-	std::string user = client_list.find(message.get_fd())->second.get_username();
-	std::string host = client_list.find(message.get_fd())->second.get_hostname();
-	std::string tmp = nick + "!" + user + "@" + host + "\r\n";
-	standard_message(message, "001", tmp);
-	
-	tmp = "Your host is " + this->hostname + ", running version " + this->version + "\r\n";
-	standard_message(message, "002", tmp);
-	
-	tmp = "This server was created September 2022\r\n";
-	standard_message(message, "003", tmp);
 
-	tmp = this->hostname + " " + this->version + " " + this->user_modes + " " + this->channel_modes + "\r\n";
-	standard_message(message, "004", tmp);
-	MOTD(message);
-	nick_user_host_message(message, "MODE", "+i");
-}
-
-void	Server::add_new_client(int const & fd)
+/*<nick>!<user>@<host>*/
+std::string Server::get_nick_user_host_txt(int const & fd)
 {
-	this->client_list.insert(std::make_pair(fd, Client(fd)));
-	std::string tmp = ":" + server_name + " NOTICE *:*** Looking up your hostname\r\n";
-	send_message(Message(fd, tmp));
-	tmp = ":" + server_name + " NOTICE *:*** Checking Ident\r\n";
-	send_message(Message(fd, tmp));
-	tmp = ":" + server_name + " NOTICE *:*** No Ident response\r\n";
-	send_message(Message(fd, tmp));
-	tmp = ":" + server_name + " NOTICE *:*** Couldn't look up your hostname\r\n";
-	send_message(Message(fd, tmp));
-	//++this->clients_size;
-	//this->update_pollfd();
-}
-
-void	Server::remove_client(int const & fd)
-{
-	this->client_list.erase(fd);
-	//--this->clients_size;
-	//this->update_pollfd();
-}
-
-void	Server::remove_message(int const & fd)
-{
-	this->received_message_list.erase(fd);
-}
-
-std::string const Server::create_member_list_string(std::map<int, Client> const & client_list, std::set<int> const & member_list)
-{
-	std::string tmp;
-	std::set<int>::iterator it = member_list.begin();
-	for (int i = 0, end = member_list.size(); i < end; ++i, ++it)
-		tmp = tmp + client_list.find(*it)->second.get_nickname() + " ";
+	Client	that_client = client_list.find(fd)->second;
+	std::string nick = that_client.get_nickname();
+	std::string user = that_client.get_username();
+	std::string host = that_client.get_hostname();
+	std::string tmp = nick + "!" + user + "@" + host;
 	return (tmp);
 }
+
+void	Server::register_client(Message const & message)
+{
+	int fd = message.get_fd();
+	server_code_nick_text_message(fd, "001", "Welcome to the Internet Relay Chat Network" + get_nick_user_host_txt(fd));
+	server_code_nick_text_message(fd, "002", ("Your host is " + this->server_name + ", running version " + this->version) );
+	server_code_nick_text_message(fd, "003", "This server was created September 2022");
+	server_code_nick_text_message(fd, "004", (this->server_name + " " + this->version + " " + this->user_modes + " " + this->channel_modes) );
+	MOTD(message);
+	nick_user_host_message(fd, "MODE", "+i");
+}
+
+// std::string const Server::create_member_list_string(std::map<int, Client> const & client_list, std::set<int> const & member_list)
+// {
+// 	std::string tmp;
+// 	std::set<int>::iterator it = member_list.begin();
+// 	for (int i = 0, end = member_list.size(); i < end; ++i, ++it)
+// 		tmp = tmp + client_list.find(*it)->second.get_nickname() + " ";
+// 	return (tmp);
+// }

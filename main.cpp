@@ -6,11 +6,10 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 15:50:55 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:15:39 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 22:27:08 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//socket
 #include <cstdlib>
 #include <cctype>
 #include <signal.h>
@@ -28,7 +27,6 @@ bool	isInt(char *userInput)
 	return (true);
 }
 
-
 void	sigint(int sign)
 {
 	if (sign == SIGINT)
@@ -37,8 +35,6 @@ void	sigint(int sign)
 		std::cout << "SIGINT signal handler called!\n";
 	}
 }
-
-
 
 int main(int argc, char **argv)
 {
@@ -60,9 +56,12 @@ int main(int argc, char **argv)
 	}
 	signal(SIGINT, &sigint);
 	Server IRC_Server(std::atoi(argv[1]), argv[2]);
+
 	IRC_Server.init_server();
+
 	while (server_run)
 		IRC_Server.run_server();
+
 	IRC_Server.stop_server();
 
 	return (0);

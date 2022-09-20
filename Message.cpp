@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 22:40:34 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 21:28:09 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ Message::Message(int const & fd, char const * input)
 	this->fd = fd;
 	this->raw = input;
 	this->complete = false;
-	if (this->raw.find("\r\n") != std::string::npos)
-		this->complete = true;
 }
 
 Message::Message(Message const & other)

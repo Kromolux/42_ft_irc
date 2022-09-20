@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/16 16:57:59 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 23:29:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string const & name, int const & fd) :name(name), moderator(fd)
-{}
+Channel::Channel(std::string const & name, int const & fd) :name(name)
+{
+	moderator_list.insert(fd);
+}
 
-Channel::Channel(Channel const & other) :name(other.name), moderator(other.moderator)
+Channel::Channel(Channel const & other) :name(other.name)
 {}
 
 Channel const & Channel::operator=(Channel const & rhs)
@@ -28,9 +30,9 @@ Channel const & Channel::operator=(Channel const & rhs)
 Channel::~Channel(void)
 {}
 
-void	Channel::add_member(int const & fd)
+void	Channel::add_member(int const & fd, std::string const & nick)
 {
-	member_list.insert(fd);
+	member_list.insert(std::make_pair(fd, nick));
 }
 
 void	Channel::remove_member(int const & fd)
@@ -38,7 +40,17 @@ void	Channel::remove_member(int const & fd)
 	member_list.erase(fd);
 }
 
-std::set<int> const &	Channel::get_member_list(void) const
+std::string const	Channel::get_member_string(void)
+{
+	std::string tmp;
+	std::map<int, std::string>::iterator it = member_list.begin();
+	std::map<int, std::string>::iterator ite = member_list.end();
+	for (; it != ite; ++it)
+		tmp = tmp + it->second + " ";
+	return (tmp);
+}
+
+std::map<int, std::string> const & Channel::get_member_list(void) const
 {
 	return (this->member_list);
 }

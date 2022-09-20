@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 18:19:34 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 00:44:39 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,82 +17,82 @@ void	Server::PASS(Message const & message)
 	not_implemented_yes(message);
 }
 
-//NICK <nickname> [ <hopcount> ]
+/*NICK <nickname> [ <hopcount> ]*/
 void	Server::NICK(Message const & message)
 {
+	std::string	nick = message.get_arg();
+	int	const fd = message.get_fd();
 	//check if nick already exists and throw error message
-	if (get_client_fd(message.get_arg()) == -1)
+	if (is_nick_available(nick))
 	{
-		std::map<int, Client>::iterator it = client_list.find(message.get_fd());
-		it->second.set_nickname(message.get_arg());
-		if (it->second.get_username() != "")
+		Client & that_client = client_list.find(fd)->second;
+		that_client.set_nickname(nick);
+		if (that_client.get_username().size() > 0)
 		{
-			it->second.set_succesfully_reg(true);
+			that_client.set_succesfully_reg(true);
 			register_client(message);
 		}
-		//create success respond message to sender
 	}
 	else
 	{
-		standard_message(message, "xxx", "= " + message.get_arg(), "Error: Nickname already registered!");
+		server_code_nick_text_message(fd, "XXX", "= " + message.get_arg(), "Error: Nickname already registered!");
+		//standard_message(message, "xxx", "= " + message.get_arg(), "Error: Nickname already registered!");
 	}
-	//set nickname
-	
 }
 
-//USER <username> <hostname> <servername> :<realname>
+/*USER <username> <hostname> <servername> :<realname> */
 void	Server::USER(Message const & message)
 {
-	std::map<int, Client>::iterator it = client_list.find(message.get_fd());
-	if (it->second.get_succesfully_reg() == false)
+	int	const fd = message.get_fd();
+	Client & that_client = client_list.find(fd)->second;
+	if (that_client.get_succesfully_reg() == false)
 	{
-		//not_implemented_yes(message);
-		client_list.find(message.get_fd())->second.set_realname(message.get_postfix());
-		client_list.find(message.get_fd())->second.set_username(message.get_arg());
-		//check for successfull registration
-		// register_client(message);
-		if (it->second.get_nickname() != "")
+		that_client.set_username(message.get_arg());
+		that_client.set_realname(message.get_postfix());
+		if (that_client.get_nickname().size() > 0)
 		{
-			it->second.set_succesfully_reg(true);
+			that_client.set_succesfully_reg(true);
 			register_client(message);
 		}
 	}
 	else
 	{
-		standard_message(message, "zzz", "= " + message.get_arg(), "Error: User already registered!");
+		server_code_nick_text_message(fd, "ZZZ", "= " + message.get_arg(), "Error: User already registered!");
 	}
 	
 }
 
 void	Server::JOIN(Message const & message)
 {
+	std::string	arg = message.get_arg();
+	int	fd = message.get_fd();
 	//validity check for channel name
-	std::map<std::string, Channel>::iterator channel = channel_list.find(message.get_arg());
+	std::map<std::string, Channel>::iterator channel = channel_list.find(arg);
 	if (channel == channel_list.end())
 	{
-		channel_list.insert(std::make_pair(message.get_arg(), Channel(message.get_arg(), message.get_fd())));
-		channel = channel_list.find(message.get_arg());
+		channel_list.insert(std::make_pair(arg, Channel(arg, fd)));
+		channel = channel_list.find(arg);
 	}
-	channel->second.add_member(message.get_fd());
+	channel->second.add_member(fd, client_list.find(fd)->second.get_nickname());
 	//check if channel exists
 	//:user42!user42@i.love.debian.org JOIN :#42
 
 	//add client to channel member list
 	//successfully joined a channel server reponse the user in the channel.
-	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
-	std::string user = client_list.find(message.get_fd())->second.get_username();
-	std::string host = client_list.find(message.get_fd())->second.get_hostname();
-	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " :" + message.get_arg() + "\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
-	send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
-	std::set<int> member_list = channel_list.find(message.get_arg())->second.get_member_list();
-	std::string list = create_member_list_string(client_list, member_list);
-	//:42.ft_irc.local MODE #42 +nt
 
-	tmp = ":" + this->hostname + " MODE " + message.get_arg() + " +nt\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
-	standard_message(message, "353", "= " + message.get_arg(), list);
-	standard_message(message, "366", message.get_arg(), "End of /NAMES list.");
+	//std::string tmp = ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " :" + message.get_arg() + "\r\n";
+	//send_message_queue.push(Message(message.get_fd(), tmp));
+	nick_user_host_message(fd, message.get_cmd(), arg);
+	send_message_queue.push(Message(fd, ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " :" + arg + "\r\n", arg));
+	
+	//std::set<int> member_list = channel_list.find(arg)->second.get_member_list();
+	std::string list = channel_list.find(arg)->second.get_member_string();
+	
+	//:42.ft_irc.local MODE #42 +nt
+	//send_message_queue.push(Message(fd, ":" + this->hostname + " MODE " + arg + " +nt\r\n"));
+	server_code_text_message(fd, "MODE", (arg + " +nt") );
+	server_code_nick_text_message(fd, "353", "= " + arg, list);
+	server_code_nick_text_message(fd, "366", arg, "End of /NAMES list.");
 	//:user42!user42@i.love.debian.org MODE user42 :+i
 	
 
@@ -100,10 +100,7 @@ void	Server::JOIN(Message const & message)
 
 void	Server::PRIVMSG(Message const & message)
 {
-	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
-	std::string user = client_list.find(message.get_fd())->second.get_username();
-	std::string host = client_list.find(message.get_fd())->second.get_hostname();
-	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
+	std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
 	std::map<std::string, Channel>::iterator channel = channel_list.find(message.get_arg());
 	if (channel != channel_list.end())
 		send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
@@ -111,14 +108,16 @@ void	Server::PRIVMSG(Message const & message)
 
 void	Server::PING(Message const & message)
 {
-	std::string tmp = ":" + server_name + " PONG " + server_name + " :" + message.get_arg() + "\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
+	//std::string tmp = ":" + server_name + " PONG " + server_name + " :" + message.get_arg() + "\r\n";
+	//send_message_queue.push(Message(message.get_fd(), tmp));
+	server_code_server_text_message(message.get_fd(), "PONG", "", message.get_arg());
 }
 
 void	Server::PONG(Message const & message)
 {
-	std::string tmp = ":" + server_name + " PING " + server_name + " :" + message.get_arg() + "\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
+	//std::string tmp = ":" + server_name + " PING " + server_name + " :" + message.get_arg() + "\r\n";
+	//send_message_queue.push(Message(message.get_fd(), tmp));
+	server_code_server_text_message(message.get_fd(), "PONG", "", message.get_arg());
 }
 
 void	Server::AWAY(Message const & message)
@@ -154,9 +153,10 @@ void	Server::NAMES(Message const & message)
 
 void	Server::MOTD(Message const & message)
 {
-	standard_message(message, "375", "Message of the Day -");
-	standard_message(message, "372", this->motd);
-	standard_message(message, "376", "End of /MOTD command.");
+	int	fd = message.get_fd();
+	server_code_nick_text_message(fd, "375", "Message of the Day -");
+	server_code_nick_text_message(fd, "372", this->motd);
+	server_code_nick_text_message(fd, "376", "End of /MOTD command.");
 }
 
 void	Server::RULES(Message const & message)
@@ -234,11 +234,13 @@ void	Server::MODE(Message const & message)
 	//not_implemented_yes(message);
 	// :42.ft_irc.local 324 user42 #42 +nt 
 	// :42.ft_irc.local 329 user42 #42 1663686893
-	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
-	std::string tmp = ":" + server_name + " 324 " + nick + " " + message.get_arg() + " +nt\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
-	tmp = ":" + server_name + " 329 " + nick + " " + message.get_arg() + "\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
+	//std::string nick = client_list.find(fd)->second.get_nickname();
+	//std::string tmp = ":" + server_name + " 324 " + nick + " " + message.get_arg() + " +nt\r\n";
+	//send_message_queue.push(Message(fd, tmp));
+	server_code_nick_text_message(message.get_fd(), "324", (message.get_arg() + " +nt") );
+	//tmp = ":" + server_name + " 329 " + nick + " " + message.get_arg() + "\r\n";
+	//send_message_queue.push(Message(message.get_fd(), tmp));
+	server_code_nick_text_message(message.get_fd(), "329", message.get_arg());
 }
 
 void	Server::SILENCE(Message const & message)
@@ -248,7 +250,8 @@ void	Server::SILENCE(Message const & message)
 
 void	Server::not_implemented_yes(Message const & message)
 {
-	std::cout << "not implemented yet!\n";
-	std::string tmp = ":" + server_name + " " + message.get_cmd() + " " + server_name + " :not implemented yet!\r\n";
-	send_message_queue.push(Message(message.get_fd(), tmp));
+	//std::cout << "not implemented yet!\n";
+	//std::string tmp = ":" + server_name + " " + message.get_cmd() + " " + server_name + " :\r\n";
+	//send_message_queue.push(Message(message.get_fd(), tmp));
+	server_code_server_text_message(message.get_fd(), message.get_cmd(),"" ,"not implemented yet!");
 }

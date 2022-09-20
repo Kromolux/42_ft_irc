@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_collect.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 16:25:08 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/20 17:46:05 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,5 +82,5 @@ void	Server::store_message(int const & fd, char const * input)
 		}
 	} while (end_pos != std::string::npos);
 	
-	this->received_message_list.insert(std::make_pair(fd, Message(fd, input)));
+	//this->received_message_list.insert(std::make_pair(fd, Message(fd, input)));
 }

@@ -3,12 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+         #
+#    By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/20 10:19:38 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/09/20 16:58:42 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
+UNAME		:= $(shell uname)
 
 NAME		:=	ircserv
 
@@ -29,7 +31,14 @@ OBJS		:=	$(SRCS:%.cpp=%.o)
 CFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 DFLAG		:=	-g -D DEBUG=1
 
+ifeq ($(UNAME), Linux)
+PORT		:=	4242
+endif
+
+ifeq ($(UNAME), Darwin)
 PORT		:=	6667
+endif
+
 PASS		:=	Wolfsburg
 
 all:

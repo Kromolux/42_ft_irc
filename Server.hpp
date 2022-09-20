@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:43:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 17:27:17 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ class Server{
 		void	standard_message(Message const & message, std::string const & code, std::string const & postfix);
 		void	standard_message(Message const & message, std::string const & code, std::string const & text, std::string const & postfix);
 		std::string const create_member_list_string(std::map<int, Client> const & client_list, std::set<int> const & member_list);
+		void 	nick_user_host_message(Message const & message, std::string const & code, std::string const & postfix);
 		
 		//commands
 		void	PASS(Message const & message);

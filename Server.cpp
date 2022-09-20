@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 16:10:29 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/20 17:28:37 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,15 @@ void	Server::init_server(void)
 	this->serverSocket = socket(server_address.sin_family, SOCK_STREAM, 0);
 	this->client_number = sizeof(client);
 	std::cout << "socket = " << serverSocket << "\n";
-
+	int enable = 1;
+	
+	int returnset = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+	std::cout << "setsockopt = " << returnset << "\n";
+		if (returnset < 0)
+	{
+		std::cout << "error " << errno << "\n";
+	}
+	
 	int returnBind = bind(serverSocket, (struct sockaddr *) &server_address, sizeof(server_address));
 	std::cout << "bind = " << returnBind << "\n";
 	if (returnBind < 0)
@@ -154,7 +162,7 @@ void	Server::register_client(Message const & message)
 	tmp = this->hostname + " " + this->version + " " + this->user_modes + " " + this->channel_modes + "\r\n";
 	standard_message(message, "004", tmp);
 	MOTD(message);
-
+	nick_user_host_message(message, "MODE", "+i");
 }
 
 void	Server::add_new_client(int const & fd)

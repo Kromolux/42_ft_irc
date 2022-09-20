@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_distribute.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 09:32:23 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 18:12:35 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	Server::distribute_messages(void)
 	for (int i = 0, end = send_message_queue.size(); i < end; ++i)
 	{
 		Message message_to_send = send_message_queue.front();
-		message_to_send.print_message();
+		//message_to_send.print_message();
 		if (message_to_send.receiver_is_channel())
 		{
 			std::map<std::string, Channel>::iterator channel = channel_list.find(message_to_send.get_receiver());
@@ -44,6 +44,7 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 		if (*it != sender)
 			send(*it, message.get_raw(), message.get_len(), MSG_DONTWAIT);
 	}
+	std::cout << server_name << ": send message to fd: " << message.get_fd() << " : " << message.get_raw();
 }
 
 void	Server::send_message(Message const & message)

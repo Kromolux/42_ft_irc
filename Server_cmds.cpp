@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 16:06:08 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/20 18:19:34 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,17 +75,27 @@ void	Server::JOIN(Message const & message)
 	}
 	channel->second.add_member(message.get_fd());
 	//check if channel exists
+	//:user42!user42@i.love.debian.org JOIN :#42
+
 	//add client to channel member list
 	//successfully joined a channel server reponse the user in the channel.
 	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
 	std::string user = client_list.find(message.get_fd())->second.get_username();
 	std::string host = client_list.find(message.get_fd())->second.get_hostname();
 	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " :" + message.get_arg() + "\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
 	send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
 	std::set<int> member_list = channel_list.find(message.get_arg())->second.get_member_list();
 	std::string list = create_member_list_string(client_list, member_list);
-	standard_message(message, "365", "= " + message.get_arg(), list);
+	//:42.ft_irc.local MODE #42 +nt
+
+	tmp = ":" + this->hostname + " MODE " + message.get_arg() + " +nt\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
+	standard_message(message, "353", "= " + message.get_arg(), list);
 	standard_message(message, "366", message.get_arg(), "End of /NAMES list.");
+	//:user42!user42@i.love.debian.org MODE user42 :+i
+	
+
 }
 
 void	Server::PRIVMSG(Message const & message)
@@ -93,7 +103,7 @@ void	Server::PRIVMSG(Message const & message)
 	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
 	std::string user = client_list.find(message.get_fd())->second.get_username();
 	std::string host = client_list.find(message.get_fd())->second.get_hostname();
-	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " :" + message.get_postfix() + "\r\n";
+	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
 	std::map<std::string, Channel>::iterator channel = channel_list.find(message.get_arg());
 	if (channel != channel_list.end())
 		send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
@@ -221,7 +231,14 @@ void	Server::SETNAME(Message const & message)
 
 void	Server::MODE(Message const & message)
 {
-	not_implemented_yes(message);
+	//not_implemented_yes(message);
+	// :42.ft_irc.local 324 user42 #42 +nt 
+	// :42.ft_irc.local 329 user42 #42 1663686893
+	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
+	std::string tmp = ":" + server_name + " 324 " + nick + " " + message.get_arg() + " +nt\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
+	tmp = ":" + server_name + " 329 " + nick + " " + message.get_arg() + "\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
 }
 
 void	Server::SILENCE(Message const & message)

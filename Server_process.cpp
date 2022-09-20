@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_process.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 11:44:08 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/20 17:47:35 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	Server::process_messages(void)
 	{
 		Message process_message = received_message_queue.front();
 		process_message.parse();
-		process_message.print_message();
+		//process_message.print_message();
 		bool	success = false;
 		std::string cmd = process_message.get_cmd();
 		for (int ii = 0; ii < cmds_size; ++ii)
@@ -77,5 +77,15 @@ void	Server::standard_message(Message const & message, std::string const & code,
 {
 	std::string nickname = client_list.find(message.get_fd())->second.get_nickname();
 	std::string tmp = ":" + server_name + " " + code + " " + nickname +  " " + text + " :" + postfix + "\r\n";
+	send_message_queue.push(Message(message.get_fd(), tmp));
+}
+
+//:user42!user42@i.love.debian.org MODE user42 :+i
+void Server::nick_user_host_message(Message const & message, std::string const & code, std::string const & postfix)
+{
+	std::string nick = client_list.find(message.get_fd())->second.get_nickname();
+	std::string user = client_list.find(message.get_fd())->second.get_username();
+	std::string host = client_list.find(message.get_fd())->second.get_hostname();
+	std::string tmp = ":" + nick + "!" + user + "@" + host + " " + code + " " + nick + " :" + postfix + "\r\n";
 	send_message_queue.push(Message(message.get_fd(), tmp));
 }

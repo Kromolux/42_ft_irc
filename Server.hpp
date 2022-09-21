@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 23:52:35 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 16:01:47 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,17 @@ class Server{
 	public:
 
 		Server(int const & port, char const * password);
-		Server(Server const & other);
-		Server & operator=(Server const & rhs);
 		~Server(void);
 
-		void	init_server(void);
+		int		init_server(void);
 		void	run_server(void);
 		void	stop_server(void);
 
 	private:
+
+		Server(Server const & other);
+		Server & operator=(Server const & rhs);
+
 		std::string server_name;
 		struct sockaddr_in server_address;
 		int			port;
@@ -66,16 +68,17 @@ class Server{
 		std::queue<Message> received_message_queue;
 		std::queue<Message> send_message_queue;
 		std::map<std::string, Channel> channel_list;
-		struct pollfd	clients[64];
+		struct pollfd	clients_pollfd[64];
 		int serverSocket;
 		struct sockaddr_in client;
 		socklen_t client_number;
 		int clients_size;
 		int returnAccept;
-		int returnPoll;
 		static const ssize_t	BUFFER_SIZE = 1024;
 		//channel in map?
 		//setup info
+
+		int		return_error(std::string const & error_text);
 
 		void	collect_messages(void);
 		void	process_messages(void);
@@ -83,6 +86,9 @@ class Server{
 		void	update_pollfd(void);
 		
 		int		get_client_fd(std::string const & nickname);
+		
+		std::map<int, Client>::iterator	get_client(std::string const & nick);
+
 		bool	is_nick_available(std::string const & nick);
 		void	register_client(Message const & message);
 		

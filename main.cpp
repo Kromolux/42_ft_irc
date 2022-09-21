@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 15:50:55 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 22:27:08 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 16:11:41 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,15 @@ int main(int argc, char **argv)
 	signal(SIGINT, &sigint);
 	Server IRC_Server(std::atoi(argv[1]), argv[2]);
 
-	IRC_Server.init_server();
+	if (IRC_Server.init_server() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+	std::cout << "Server is up and running\n";
 
 	while (server_run)
 		IRC_Server.run_server();
 
 	IRC_Server.stop_server();
 
-	return (0);
+	return (EXIT_SUCCESS);
 }

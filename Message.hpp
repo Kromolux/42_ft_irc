@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:49:20 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/18 22:36:08 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 15:37:36 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Message
 		std::string const & get_cmd(void) const;
 		std::string const & print_message(void) const;
 		int const & get_fd(void) const;
-		int get_len(void) const;
+		int		get_len(void) const;
 		char const * get_raw(void) const;
 		std::string const & get_receiver(void) const;
 		std::string const & get_postfix(void) const;
@@ -43,7 +43,7 @@ class Message
 		std::string	receiver;
 		std::string	content;
 		std::string	arg;
-		int fd;
+		int			fd;
 		std::string	raw;
-		bool	complete;
+		bool		complete;
 };

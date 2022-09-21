@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/20 23:29:49 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 17:33:16 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,13 @@ Channel const & Channel::operator=(Channel const & rhs)
 Channel::~Channel(void)
 {}
 
+
 void	Channel::add_member(int const & fd, std::string const & nick)
-{
-	member_list.insert(std::make_pair(fd, nick));
-}
+{ member_list.insert(std::make_pair(fd, nick)); }
 
 void	Channel::remove_member(int const & fd)
-{
-	member_list.erase(fd);
-}
+{ member_list.erase(fd); }
+
 
 std::string const	Channel::get_member_string(void)
 {
@@ -51,6 +49,4 @@ std::string const	Channel::get_member_string(void)
 }
 
 std::map<int, std::string> const & Channel::get_member_list(void) const
-{
-	return (this->member_list);
-}
+{ return (this->member_list); }

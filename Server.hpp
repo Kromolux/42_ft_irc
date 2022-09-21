@@ -6,34 +6,32 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 16:01:47 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 17:19:23 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <map>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
 #include <poll.h>
-
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <iostream>
-#include <string.h>
-
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 
+//#include <stdio.h>
+//#include <stdlib.h>
+
+#include <iostream>
 #include <cstring>
+
+#include <map>
 #include <queue>
+
 #include "Client.hpp"
 #include "Message.hpp"
 #include "Channel.hpp"
@@ -54,52 +52,53 @@ class Server{
 		Server(Server const & other);
 		Server & operator=(Server const & rhs);
 
-		std::string server_name;
-		struct sockaddr_in server_address;
-		int			port;
-		std::string	password;
-		std::string hostname;
-		std::string	version;
-		std::string	user_modes;
-		std::string	channel_modes;
-		std::string motd;
-		//clients in a map?
-		std::map<int, Client> client_list;
-		std::queue<Message> received_message_queue;
-		std::queue<Message> send_message_queue;
+		std::string				server_name;
+		std::string				password;
+		std::string				hostname;
+		std::string				version;
+		std::string				user_modes;
+		std::string				channel_modes;
+		std::string				motd;
+		struct sockaddr_in		server_address;
+		struct sockaddr_in		client;
+		struct pollfd			clients_pollfd[64];
+		socklen_t				client_number;
+		int						serverSocket;
+		int						clients_size;
+		int						returnAccept;
+		int						port;
+
+		std::map<int, Client>	client_list;
+
+		std::queue<Message>		received_message_queue;
+		std::queue<Message>		send_message_queue;
+
 		std::map<std::string, Channel> channel_list;
-		struct pollfd	clients_pollfd[64];
-		int serverSocket;
-		struct sockaddr_in client;
-		socklen_t client_number;
-		int clients_size;
-		int returnAccept;
+
+	
 		static const ssize_t	BUFFER_SIZE = 1024;
-		//channel in map?
-		//setup info
+
 
 		int		return_error(std::string const & error_text);
 
 		void	collect_messages(void);
 		void	process_messages(void);
 		void	distribute_messages(void);
-		void	update_pollfd(void);
-		
-		int		get_client_fd(std::string const & nickname);
-		
-		std::map<int, Client>::iterator	get_client(std::string const & nick);
 
+		void	update_pollfd(void);
+
+		std::map<int, Client>::iterator	get_client(std::string const & nick);
+		int		get_client_fd(std::string const & nickname);
 		bool	is_nick_available(std::string const & nick);
 		void	register_client(Message const & message);
 		
 		void	store_message(int const & fd, char const * input);
-		void	remove_message(int const & fd);
+
 		void	send_channel_message(Channel const & channel, Message const & message);
 		void	send_message(Message const & message);
-		//void	create_error_message(Message const & message);
-		//std::string const create_member_list_string(std::map<int, Client> const & client_list, std::set<int> const & member_list);
-		//void	server_code_nick_message(int const & fd, std::string const & code, std::string const & postfix = "");
-		std::string get_nick_user_host_txt(int const & fd);
+
+		std::string	get_nick_user_host_txt(int const & fd);
+
 		void	server_code_nick_text_message(int const & fd, std::string const & code, std::string const & text = "", std::string const & postfix = "");
 		void	server_code_server_text_message(int const & fd, std::string const & code, std::string const & text = "", std::string const & postfix = "");
 		void	server_code_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix = "");

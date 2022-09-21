@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 00:26:29 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/21 17:11:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 		if (it->first != sender)
 		{
 			send(it->first, message.get_raw(), message.get_len(), MSG_DONTWAIT);
-			std::cout << server_name << ": send channel message to fd: " << message.get_fd() << " [" << message.get_raw();
+			std::cout << server_name << ": send channel message to fd: " << sender << " [" << message.get_raw();
 		}
 	}
 }

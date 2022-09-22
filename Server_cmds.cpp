@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 11:31:04 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 14:43:24 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,6 @@ void	Server::JOIN(Message const & message)
 
 void	Server::PRIVMSG(Message const & message)
 {
-	//std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
 	//std::map<std::string, Channel>::iterator	it_channel = channel_list.find(message.get_arg());
 
 	if (message.get_arg()[0] == '#')
@@ -112,12 +111,15 @@ void	Server::PRIVMSG(Message const & message)
 		return ;
 
 	std::map<int, Client>::iterator		it_client = get_client(message.get_arg());
-	nick_user_host_message(it_client->first, message.get_cmd() + " " +  message.get_arg(), message.get_postfix());
+	std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
+	send_message_queue.push(Message(it_client->first, tmp));
+	
+	//nick_user_host_message(message.get_fd(), message.get_cmd() + " " +  message.get_arg(), message.get_postfix(), it_client->second.get_nickname());
+	//nick_user_host_message(message.get_fd(), message.get_cmd() + " " +  it_client->second.get_nickname(), message.get_postfix());
 	
 	//if (it_channel != channel_list.end())
 		//send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
 	//else if (it_client != client_list.end())
-		//send_message_queue.push(Message(it_client->first, tmp));
 }
 
 std::map<int, Client>::iterator	Server::get_client(std::string const & nick)

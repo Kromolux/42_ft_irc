@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 19:51:03 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 10:13:15 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	Message::parse(void)
 	
 	start_pos = tmp.find_first_not_of(whitespace, 0);
 	end_pos = tmp.find_first_of(whitespace, start_pos);
-	if (start_pos != std::string::npos)	//arg0
+	if (start_pos != std::string::npos)	//arg
 	{
 		this->arg = tmp.substr(start_pos, end_pos - start_pos);
 		tmp.erase(start_pos, end_pos - start_pos);

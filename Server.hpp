@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:19:23 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 10:53:07 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,11 @@ class Server{
 		void	server_code_server_text_message(int const & fd, std::string const & code, std::string const & text = "", std::string const & postfix = "");
 		void	server_code_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix = "");
 		void	server_code_message(std::string const & nick_server, int const & fd, std::string const & code, std::string const & text, std::string const & postfix);
-		void 	nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix = "");
+		void 	nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix = "", std::string const & receiver = "");
 		
+		int		check_channel(Message const & message);
+		int		check_client(Message const & message);
+	
 		//commands
 		void	PASS(Message const & message);
 		void	NICK(Message const & message);

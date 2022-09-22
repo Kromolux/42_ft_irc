@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:33:16 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 10:09:29 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,13 @@ void	Channel::add_member(int const & fd, std::string const & nick)
 void	Channel::remove_member(int const & fd)
 { member_list.erase(fd); }
 
+bool	Channel::is_client_on_channel(int const & fd)
+{
+	std::map<int, std::string>::iterator it = member_list.find(fd);
+	if (it == member_list.end())
+		return (false);
+	return (true);
+}
 
 std::string const	Channel::get_member_string(void)
 {

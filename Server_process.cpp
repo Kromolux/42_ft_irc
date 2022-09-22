@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 15:32:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 11:15:41 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,17 @@ void	Server::process_messages(void)
 	}
 }
 
+/*<nick>!<user>@<host>*/
+std::string Server::get_nick_user_host_txt(int const & fd)
+{
+	Client	that_client = client_list.find(fd)->second;
+	std::string nick = that_client.get_nickname();
+	std::string user = that_client.get_username();
+	std::string host = that_client.get_hostname();
+	std::string tmp = nick + "!" + user + "@" + host;
+	return (tmp);
+}
+
 /*:<server> <code> <nick> [ <text> ] [ :<postfix> ]*/
 void	Server::server_code_nick_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix)
 {
@@ -84,12 +95,42 @@ void	Server::server_code_message(std::string const & nick_server, int const & fd
 
 //:user42!user42@i.love.debian.org MODE user42 :+i
 /*:<nick>!<user>@<host> <code> [ :<postfix> ]*/
-void Server::nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix)
+void Server::nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix, std::string const & receiver)
 {
 	Client	that_client = client_list.find(fd)->second;
 	std::string	fix;
 	if (postfix.size() > 0)
 		fix = " :" + postfix;
 	std::string msg = ":" + get_nick_user_host_txt(fd) + " " + code + fix + "\r\n";
-	send_message_queue.push(Message(fd, msg));
+	send_message_queue.push(Message(fd, msg, receiver));
+}
+
+int Server::check_channel(Message const & message)
+{
+	int fd = message.get_fd();
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(message.get_arg());
+
+	if (channel_it == channel_list.end())
+	{
+		server_code_nick_text_message(fd, "402", message.get_arg(), "No such channel");
+		return (EXIT_FAILURE);
+	}
+	if (!channel_it->second.is_client_on_channel(fd))
+	{
+		server_code_nick_text_message(fd, "442", message.get_arg(), "You are not on that channel");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_client(Message const & message)
+{
+	std::map<int, Client>::iterator client_it = get_client(message.get_arg());
+
+	if (client_it == client_list.end())
+	{
+		server_code_nick_text_message(message.get_fd(), "401", message.get_arg(), "No such nick");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
 }

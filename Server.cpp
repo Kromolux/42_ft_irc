@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 16:41:58 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 09:47:15 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,17 +136,6 @@ int	Server::get_client_fd(std::string const & nickname)
 bool	Server::is_nick_available(std::string const & nick)
 {
 	return (!get_client_fd(nick));
-}
-
-/*<nick>!<user>@<host>*/
-std::string Server::get_nick_user_host_txt(int const & fd)
-{
-	Client	that_client = client_list.find(fd)->second;
-	std::string nick = that_client.get_nickname();
-	std::string user = that_client.get_username();
-	std::string host = that_client.get_hostname();
-	std::string tmp = nick + "!" + user + "@" + host;
-	return (tmp);
 }
 
 /*

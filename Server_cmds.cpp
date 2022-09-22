@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:00:27 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 11:31:04 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void	Server::USER(Message const & message)
 	
 }
 
+/* JOIN <channel>{,<channel>} [<key>{,<key>}] */
 void	Server::JOIN(Message const & message)
 {
 	std::string	arg = message.get_arg();
@@ -81,8 +82,8 @@ void	Server::JOIN(Message const & message)
 	//std::string tmp = ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " :" + message.get_arg() + "\r\n";
 
 	nick_user_host_message(fd, message.get_cmd(), arg);
-
-	send_message_queue.push( Message(fd, ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " :" + arg + "\r\n", arg) );
+	nick_user_host_message(fd, message.get_cmd(), arg, arg);
+	//send_message_queue.push( Message(fd, ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " :" + arg + "\r\n", arg) );
 	
 	//:42.ft_irc.local MODE #42 +nt
 	server_code_text_message(fd, "MODE", (arg + " +nt") );
@@ -95,14 +96,28 @@ void	Server::JOIN(Message const & message)
 
 void	Server::PRIVMSG(Message const & message)
 {
-	std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
-	std::map<std::string, Channel>::iterator	it_channel = channel_list.find(message.get_arg());
-	std::map<int, Client>::iterator		it_client = get_client(message.get_arg());
+	//std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " +  message.get_arg() + " :" + message.get_postfix() + "\r\n";
+	//std::map<std::string, Channel>::iterator	it_channel = channel_list.find(message.get_arg());
 
-	if (it_channel != channel_list.end())
-		send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
-	else if (it_client != client_list.end())
-		send_message_queue.push(Message(it_client->first, tmp));
+	if (message.get_arg()[0] == '#')
+	{
+		if (check_channel(message) == EXIT_FAILURE)
+			return ;
+
+		nick_user_host_message(message.get_fd(), message.get_cmd() + " " +  message.get_arg(), message.get_postfix(), message.get_arg());
+		return ;
+	}
+	
+	if (check_client(message) == EXIT_FAILURE)
+		return ;
+
+	std::map<int, Client>::iterator		it_client = get_client(message.get_arg());
+	nick_user_host_message(it_client->first, message.get_cmd() + " " +  message.get_arg(), message.get_postfix());
+	
+	//if (it_channel != channel_list.end())
+		//send_message_queue.push(Message(message.get_fd(), tmp, message.get_arg()));
+	//else if (it_client != client_list.end())
+		//send_message_queue.push(Message(it_client->first, tmp));
 }
 
 std::map<int, Client>::iterator	Server::get_client(std::string const & nick)
@@ -133,9 +148,23 @@ void	Server::AWAY(Message const & message)
 	not_implemented_yes(message);
 }
 
+/* PART <channel>{,<channel>} */
 void	Server::PART(Message const & message)
 {
-	not_implemented_yes(message);
+	if (check_channel(message) == EXIT_FAILURE)
+		return ;
+
+	std::map<std::string, Channel>::iterator	channel_it = channel_list.find(message.get_arg());
+	channel_it->second.remove_member(message.get_fd());
+	//if channel is empty remove it from list
+	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + message.get_arg());
+
+	if (channel_it->second.get_member_list().size() == 0)
+	{
+		channel_list.erase(channel_it);
+		return ;
+	}
+	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + message.get_arg(), "", message.get_arg());
 }
 
 

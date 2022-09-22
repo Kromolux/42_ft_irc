@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 15:21:23 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 22:33:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	Server::collect_messages(void)
 				continue;
 			}
 			buffer[recv_size] = '\0';
-			std::cout << "recv = " << recv_size << " from fd = " << clients_pollfd[i].fd << " [" << buffer << "]\n";
+			std::cout << "recv = " << recv_size << " fd = " << clients_pollfd[i].fd << " " << client_list.find(clients_pollfd[i].fd)->second.get_nickname() << " [" << buffer << "]\n";
 			this->store_message(clients_pollfd[i].fd, buffer);
 		}
 	}

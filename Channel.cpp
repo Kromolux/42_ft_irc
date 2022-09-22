@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 10:09:29 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 19:48:52 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,32 @@ Channel::~Channel(void)
 
 
 void	Channel::add_member(int const & fd, std::string const & nick)
-{ member_list.insert(std::make_pair(fd, nick)); }
+{
+	if (member_list.size() == 0)
+	{
+		moderator_list.insert(fd);
+	}
+	member_list.insert(std::make_pair(fd, nick));
+}
 
 void	Channel::remove_member(int const & fd)
-{ member_list.erase(fd); }
+{
+	member_list.erase(fd);
+	moderator_list.erase(fd);
+}
 
 bool	Channel::is_client_on_channel(int const & fd)
 {
 	std::map<int, std::string>::iterator it = member_list.find(fd);
 	if (it == member_list.end())
+		return (false);
+	return (true);
+}
+
+bool	Channel::is_client_is_moderator(int const & fd)
+{
+	std::set<int>::iterator it = moderator_list.find(fd);
+	if (it == moderator_list.end())
 		return (false);
 	return (true);
 }
@@ -52,6 +69,21 @@ std::string const	Channel::get_member_string(void)
 	std::map<int, std::string>::iterator ite = member_list.end();
 	for (; it != ite; ++it)
 		tmp = tmp + it->second + " ";
+	return (tmp);
+}
+
+std::string const	Channel::get_member_string_moderator(void)
+{
+	std::string tmp;
+	std::map<int, std::string>::iterator it = member_list.begin();
+	std::map<int, std::string>::iterator ite = member_list.end();
+	for (; it != ite; ++it)
+	{
+		if (moderator_list.find(it->first) == moderator_list.end())
+			tmp = tmp + it->second + " ";
+		else
+			tmp = tmp + "@" + it->second + " ";
+	}
 	return (tmp);
 }
 

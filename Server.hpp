@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 10:53:07 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 21:05:55 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 //#include <stdlib.h>
 
 #include <iostream>
+#include <sstream>
 #include <cstring>
 
 #include <map>
@@ -87,7 +88,7 @@ class Server{
 
 		void	update_pollfd(void);
 
-		std::map<int, Client>::iterator	get_client(std::string const & nick);
+		std::map<int, Client>::iterator	get_client_by_nick(std::string const & nick);
 		int		get_client_fd(std::string const & nickname);
 		bool	is_nick_available(std::string const & nick);
 		void	register_client(Message const & message);
@@ -105,9 +106,13 @@ class Server{
 		void	server_code_message(std::string const & nick_server, int const & fd, std::string const & code, std::string const & text, std::string const & postfix);
 		void 	nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix = "", std::string const & receiver = "");
 		
+		int		check_args(Message const & message, size_t const & args_count);
+		int		check_authentication(int const & client_fd);
 		int		check_channel(Message const & message);
-		int		check_client(Message const & message);
-	
+		int		check_client(int const & sender_fd, std::string const & check_nick);
+		int		check_nick_in_channel(Message const & message);
+		int		check_client_moderator(Message const & message);
+		
 		//commands
 		void	PASS(Message const & message);
 		void	NICK(Message const & message);
@@ -141,4 +146,14 @@ class Server{
 		void	SILENCE(Message const & message);
 		
 		void	not_implemented_yes(Message const & message);
+		
+		void	PRIVMSG_NOTICE(Message const & message, std::string const & type);
 };
+
+template <typename T>
+std::string number_to_string ( T number )
+{
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
+}

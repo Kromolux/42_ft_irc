@@ -6,13 +6,13 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 16:13:58 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:29:28 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 16:24:57 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(int const & fd) :fd(fd), nickname(""), username(""), succesfully_reg(false)
+Client::Client(int const & fd) :fd(fd), nickname(""), username(""), authenticated(false), succesfully_reg(false)
 {}
 
 Client::Client(Client const & other) :fd(other.fd), nickname(other.nickname), username(other.username), message_buffer(""), succesfully_reg(false)
@@ -70,6 +70,13 @@ void	Client::append_message_buffer(std::string const & input)
 
 std::string const & Client::get_message_buffer(void) const
 { return (this->message_buffer); }
+
+
+void	Client::set_authenticated(bool const & authenticated)
+{ this->authenticated = authenticated; }
+
+bool const & Client::get_authenticated(void) const
+{ return (this->authenticated); }
 
 
 void	Client::set_succesfully_reg(bool const & succesfully_reg)

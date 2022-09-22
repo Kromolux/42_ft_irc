@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:49:20 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 19:38:54 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 21:18:31 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Message
 		
 		bool				receiver_is_channel(void) const;
 
-		std::string const & print_message(void) const;
+		std::string const &	print_message(void) const;
 
 	private:
 
@@ -46,9 +46,7 @@ class Message
 		int			fd;
 		std::string	prefix;
 		std::string	cmd;
-		std::string	arg;
 		std::vector<std::string>	args;
-		std::string	postfix;
 		std::string	sender;
 		std::string	receiver;
 		std::string	raw;

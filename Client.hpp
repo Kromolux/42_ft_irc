@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 16:14:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:29:21 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 16:47:18 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,12 @@ class Client
 		void				clear_message_buffer(void);
 		void				append_message_buffer(std::string const & input);
 		std::string const &	get_message_buffer(void) const;
+	
+		void				set_authenticated(bool const & authenticated);
+		bool const &		get_authenticated(void) const;
+
 		void				set_succesfully_reg(bool const & succesfully_reg);
-		bool		const &	get_succesfully_reg(void) const;
+		bool const &		get_succesfully_reg(void) const;
 
 	
 	private:
@@ -50,5 +54,6 @@ class Client
 		std::string	realname;
 		std::string	hostname;
 		std::string	message_buffer;
+		bool		authenticated;
 		bool		succesfully_reg;
 };

@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 11:23:44 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 22:35:26 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,13 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 		if (it->first != sender)
 		{
 			send(it->first, message.get_raw(), message.get_len(), MSG_DONTWAIT);
-			std::cout << server_name << ": send channel message to fd: " << it->first << " [" << message.get_raw();
+			std::cout << server_name << ": send channel msg fd: " << it->first << " " << client_list.find(it->first)->second.get_nickname() << " [" << message.get_raw();
 		}
 	}
 }
 
 void	Server::send_message(Message const & message)
 {
-	std::cout << server_name << ": send message to fd: " << message.get_fd() << " [" << message.get_raw();
+	std::cout << server_name << ": send msg fd: " << message.get_fd() << " " << client_list.find(message.get_fd())->second.get_nickname() << " [" << message.get_raw();
 	send(message.get_fd(), message.get_raw(), message.get_len(), MSG_DONTWAIT);
 }

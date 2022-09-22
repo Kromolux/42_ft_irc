@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 11:15:41 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 21:05:33 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,23 @@ void	Server::process_messages(void)
 		process_message.print_message();
 		executed_cmd = false;
 
-		for (int ii = 0; ii < CMDS_SIZE; ++ii)
+		if (process_message.get_cmd() == "PASS" || check_authentication(process_message.get_fd()) == EXIT_SUCCESS)
 		{
-			if (process_message.get_cmd() == CMDS[ii])
-			{
-				(this->*func[ii])(process_message);
-				executed_cmd = true;
-				break;
-			}
-		}
 
-		if (executed_cmd == false)
-			server_code_nick_text_message(process_message.get_fd(), "421", process_message.get_cmd(), "Unknown command!");
+			for (int ii = 0; ii < CMDS_SIZE; ++ii)
+			{
+				if (process_message.get_cmd() == CMDS[ii])
+				{
+					(this->*func[ii])(process_message);
+					executed_cmd = true;
+					break;
+				}
+			}
+
+			if (executed_cmd == false)
+				server_code_nick_text_message(process_message.get_fd(), "421", process_message.get_cmd(), "Unknown command!");
+
+		}
 		received_message_queue.pop();
 	}
 }
@@ -105,31 +110,87 @@ void Server::nick_user_host_message(int const & fd, std::string const & code, st
 	send_message_queue.push(Message(fd, msg, receiver));
 }
 
-int Server::check_channel(Message const & message)
+int Server::check_args(Message const & message, size_t const & args_count)
 {
-	int fd = message.get_fd();
-	std::map<std::string, Channel>::iterator channel_it = channel_list.find(message.get_arg());
-
-	if (channel_it == channel_list.end())
+	if (message.get_args().size() < args_count)
 	{
-		server_code_nick_text_message(fd, "402", message.get_arg(), "No such channel");
-		return (EXIT_FAILURE);
-	}
-	if (!channel_it->second.is_client_on_channel(fd))
-	{
-		server_code_nick_text_message(fd, "442", message.get_arg(), "You are not on that channel");
+		server_code_nick_text_message(message.get_fd(), "461", message.get_cmd(), "Not enough parameters");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
-int Server::check_client(Message const & message)
+int	Server::check_authentication(int const & client_fd)
 {
-	std::map<int, Client>::iterator client_it = get_client(message.get_arg());
+	std::map<int, Client>::iterator client_it = client_list.find(client_fd);
+
+	if (client_it == client_list.end())
+		return (EXIT_FAILURE);
+
+	if (client_it->second.get_authenticated() == false)
+	{
+		server_code_nick_text_message(client_fd, "451", "*", "You have not registered");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_channel(Message const & message)
+{
+	std::string	arg0 = message.get_args().at(0);
+	int 		fd = message.get_fd();
+	
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(arg0);
+
+	if (channel_it == channel_list.end())
+	{
+		server_code_nick_text_message(fd, "402", arg0, "No such channel");
+		return (EXIT_FAILURE);
+	}
+	if (!channel_it->second.is_client_on_channel(fd))
+	{
+		server_code_nick_text_message(fd, "442", arg0, "You are not on that channel");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_client(int const & sender_fd, std::string const & check_nick)
+{
+	std::map<int, Client>::iterator client_it = get_client_by_nick(check_nick);
 
 	if (client_it == client_list.end())
 	{
-		server_code_nick_text_message(message.get_fd(), "401", message.get_arg(), "No such nick");
+		server_code_nick_text_message(sender_fd, "401", check_nick, "No such nick");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_nick_in_channel(Message const & message)
+{
+	std::string	channel_name = message.get_args().at(0);
+	std::string	nick_name = message.get_args().at(1);
+
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+	
+	if (channel_it->second.is_client_on_channel(message.get_fd()))
+	{
+		server_code_nick_text_message(message.get_fd(), "441", nick_name, "Not in channel");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_client_moderator(Message const & message)
+{
+	std::string	channel_name = message.get_args().at(0);
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+
+	if (channel_it->second.is_client_is_moderator(message.get_fd()))
+	{
+		std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
+		server_code_nick_text_message(message.get_fd(), "482", channel_name, "You are not channel operator");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);

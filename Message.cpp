@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 10:13:15 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 21:18:16 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,11 @@ Message::Message(Message const & other)
 {
 	this->fd = other.fd;
 	this->prefix = other.prefix;
-	this->postfix = other.postfix;
 	this->cmd = other.cmd;
 	this->sender = other.sender;
 	this->receiver = other.receiver;
-	this->arg = other.arg;
 	this->raw = other.raw;
+	this->args = other.args;
 }
 
 Message const & Message::operator=(Message const & rhs)
@@ -66,28 +65,20 @@ void	Message::parse(void)
 		this->cmd = tmp.substr(start_pos, end_pos - start_pos);
 	tmp.erase(0, end_pos);
 
-	start_pos = tmp.find(':');
-	if (start_pos != std::string::npos)	//postfix
-	{
-		++start_pos;
-		this->postfix = tmp.substr(start_pos);
-		tmp.erase(start_pos);
-	}
-	
-	start_pos = tmp.find_first_not_of(whitespace, 0);
-	end_pos = tmp.find_first_of(whitespace, start_pos);
-	if (start_pos != std::string::npos)	//arg
-	{
-		this->arg = tmp.substr(start_pos, end_pos - start_pos);
-		tmp.erase(start_pos, end_pos - start_pos);
-	}
-	
+	end_pos = 0;
 	do									//args
 	{
 		start_pos = tmp.find_first_not_of(whitespace, end_pos);
 		end_pos = tmp.find_first_of(whitespace, start_pos);
 		if (start_pos != std::string::npos)
+		{
+			if (tmp[start_pos] == ':')			//postfix
+			{
+				args.push_back(tmp.substr(start_pos + 1));
+				return ;
+			}
 			args.push_back(tmp.substr(start_pos, end_pos - start_pos));
+		}
 	} while (start_pos != std::string::npos);
 }
 
@@ -100,14 +91,18 @@ std::string const & Message::get_prefix(void) const
 std::string const & Message::get_cmd(void) const
 { return (this->cmd); }
 
-std::string const & Message::get_arg(void) const
-{ return (this->arg); }
+// std::string const & Message::get_arg(void) const
+// { return (this->arg); }
 
 std::vector<std::string> const & Message::get_args(void) const
 { return (this->args); }
 
+// std::string const & Message::get_postfix(void) const
+// { return (this->postfix); }
+
 std::string const & Message::get_postfix(void) const
-{ return (this->postfix); }
+{ return (this->args.back()); }
+
 
 std::string const & Message::get_receiver(void) const
 { return (this->receiver); }
@@ -129,8 +124,8 @@ std::string const & Message::print_message(void) const
 {
 	std::cout	<< "fd: [" << this->fd << "]\n"
 				<< "prefix: [" << this->prefix << "]\n"
-				<< "CMD: [" << this->cmd << "]\n"
-				<< "arg: [" << this->arg << "]\n"
-				<< "postfix: [" << this->postfix << "]\n";
+				<< "cmd: [" << this->cmd << "]\n";
+	for (int i = 0, end = this->args.size(); i < end; ++i)
+		std::cout << "args_" << i << " [" << this->args.at(i) << "]\n";
 	return (this->raw);
 }

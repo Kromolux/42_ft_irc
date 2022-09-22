@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 09:47:15 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/22 16:35:01 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,4 +158,17 @@ void	Server::register_client(Message const & message)
 	server_code_nick_text_message(fd, "004", (this->server_name + " " + this->version + " " + this->user_modes + " " + this->channel_modes) );
 	MOTD(message);
 	nick_user_host_message(fd, "MODE", "+i");
+}
+
+std::map<int, Client>::iterator	Server::get_client_by_nick(std::string const & nick)
+{
+	std::map<int, Client>::iterator	it = client_list.begin();
+	std::map<int, Client>::iterator	ite = client_list.end();
+
+	for (; it != ite; ++it)
+	{
+		if (it->second.get_nickname() == nick)
+			return (it);
+	}
+	return (it);
 }

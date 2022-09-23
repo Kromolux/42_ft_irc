@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 22:30:05 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/23 16:41:10 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,8 @@ void	Server::PRIVMSG(Message const & message)
 
 void	Server::PING(Message const & message)
 {
+	if (check_args(message, 1) == EXIT_FAILURE)
+		return ;
 	server_code_server_text_message(message.get_fd(), "PONG", "", message.get_args().at(0));
 }
 
@@ -178,6 +180,8 @@ void	Server::WHOWAS(Message const & message)
 
 void	Server::NAMES(Message const & message)
 {
+	if (check_args(message, 1) == EXIT_FAILURE)
+		return ;
 	std::string arg0;
 	std::string list;
 	if (message.get_args().empty() == false)
@@ -214,6 +218,9 @@ void	Server::MAP(Message const & message)
 
 void	Server::QUIT(Message const & message)
 {
+	//TODO: Check if it's doable with no arguments!
+	if (check_args(message, 1) == EXIT_FAILURE)
+		return ;
 	int	fd = message.get_fd();
 
 	std::map<std::string, Channel>::iterator channel_it = channel_list.begin();
@@ -343,6 +350,9 @@ void	Server::SETNAME(Message const & message)
 * MODE <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>] [<ban mask>] */
 void	Server::MODE(Message const & message)
 {
+	//TODO: Check this!
+	if (check_args(message, 1) == EXIT_FAILURE)
+		return ;
 	//not_implemented_yes(message);
 	// :42.ft_irc.local 324 user42 #42 +nt 
 	// :42.ft_irc.local 329 user42 #42 1663686893

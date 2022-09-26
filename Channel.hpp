@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:15:31 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 19:47:31 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/26 18:47:53 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,15 @@ class Channel
 		std::string const	get_member_string(void);
 		std::string const	get_member_string_moderator(void);
 		std::map<int, std::string> const & get_member_list(void) const;
+		void				set_topic(std::string const & input);
+		std::string const &	get_topic(void) const;
 		
 	private:
 
 		Channel const & operator=(Channel const & rhs);
 
 		std::string					name;
+		std::string					topic;
 		std::set<int>				moderator_list;
 		std::map<int, std::string>	member_list;
 		

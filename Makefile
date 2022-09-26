@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+         #
+#    By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/21 00:05:12 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/09/26 11:56:29 by ehosu            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,13 +31,7 @@ OBJS		:=	$(SRCS:%.cpp=%.o)
 CFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 DFLAG		:=	-g -D DEBUG=1
 
-ifeq ($(UNAME), Linux)
 PORT		:=	4242
-endif
-
-ifeq ($(UNAME), Darwin)
-PORT		:=	9999
-endif
 
 PASS		:=	Wolfsburg
 

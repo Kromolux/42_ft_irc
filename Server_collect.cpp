@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_collect.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 22:33:49 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/26 16:48:18 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	Server::store_message(int const & fd, char const * input)
 {
 	std::string	tmp = input;
 	size_t		end_pos = 0;
-	Client		that_client = client_list.find(fd)->second;
+	Client		&that_client = client_list.find(fd)->second;
 
 	do
 	{

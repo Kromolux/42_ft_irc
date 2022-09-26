@@ -6,7 +6,7 @@
 /*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/26 11:59:17 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/26 16:58:19 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ class Server{
 		void	SETNAME(Message const & message);
 		void	MODE(Message const & message);
 		void	SILENCE(Message const & message);
+		void	TOPIC(Message const & message);
 		
 		void	not_implemented_yes(Message const & message);
 		

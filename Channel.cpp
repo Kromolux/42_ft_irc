@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 19:48:52 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/26 16:57:37 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,13 @@ std::string const	Channel::get_member_string_moderator(void)
 	}
 	return (tmp);
 }
+
+void				Channel::set_topic(std::string const & input)
+{ this->topic = input; }
+
+std::string const &	Channel::get_topic(void) const
+{ return (this->topic); }
+
 
 std::map<int, std::string> const & Channel::get_member_list(void) const
 { return (this->member_list); }

@@ -6,7 +6,7 @@
 /*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/23 16:41:10 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/26 17:08:51 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -398,3 +398,36 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 	std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + type + " " +  arg0 + " :" + message.get_postfix() + "\r\n";
 	send_message_queue.push(Message(it_client->first, tmp));
 }
+
+// TODO: Finish TOPIC command
+void	Server::TOPIC(Message const & message)
+{
+
+	return;
+	// if (check_args(message, 1) == EXIT_SUCCESS)
+		
+
+	// if (check_channel(message) == EXIT_FAILURE)
+	// 	return ;
+
+	// if (check_client(message.get_fd(), message.get_args().at(1)) == EXIT_FAILURE)
+	// 	return ;
+
+	// if (check_nick_in_channel(message) == EXIT_FAILURE)
+	// 	return ;
+
+	// if (check_client_moderator(message) == EXIT_FAILURE)
+	// 	return ;
+
+	// std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
+	// std::string	channel_name = message.get_args().at(0);
+	// std::string	nick_name = message.get_args().at(1);
+	// std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+	// std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+	
+	// channel_it->second.remove_member(client_it->first);
+
+	// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick);
+	// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick, channel_name);
+}
+

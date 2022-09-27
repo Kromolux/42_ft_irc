@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/26 16:58:19 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 19:24:10 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,9 @@ class Server{
 		int		check_client(int const & sender_fd, std::string const & check_nick);
 		int		check_nick_in_channel(Message const & message);
 		int		check_client_moderator(Message const & message);
-		
+		int		check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name);
+		int		check_channel_name(int const & fd, std::string const & channel_name);
+
 		//commands
 		void	PASS(Message const & message);
 		void	NICK(Message const & message);

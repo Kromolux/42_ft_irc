@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/26 16:57:37 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 18:58:57 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,26 @@ void	Channel::remove_member(int const & fd)
 	moderator_list.erase(fd);
 }
 
+void	Channel::add_operator(int const & fd)
+{
+	moderator_list.insert(fd);
+}
+
+void	Channel::remove_operator(int const & fd)
+{
+	moderator_list.erase(fd);
+}
+
+void	Channel::add_ban(std::string const & nick)
+{
+	ban_list.insert(nick);
+}
+
+void	Channel::remove_ban(std::string const & nick)
+{
+	ban_list.erase(nick);
+}
+		
 bool	Channel::is_client_on_channel(int const & fd)
 {
 	std::map<int, std::string>::iterator it = member_list.find(fd);
@@ -96,3 +116,6 @@ std::string const &	Channel::get_topic(void) const
 
 std::map<int, std::string> const & Channel::get_member_list(void) const
 { return (this->member_list); }
+
+std::set<std::string> const	& Channel::get_ban_list(void)
+{ return (this->ban_list); }

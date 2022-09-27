@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_process.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 15:53:59 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 19:24:50 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,29 @@ int Server::check_client_moderator(Message const & message)
 	{
 		std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
 		server_code_nick_text_message(message.get_fd(), "482", channel_name, "You are not channel operator");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	Server::check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name)
+{
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+	
+	if (channel_it->second.get_ban_list().find(nick_name) != channel_it->second.get_ban_list().end())
+	{
+		server_code_nick_text_message(fd, "474", channel_name, "Cannot join channel (+b)");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	Server::check_channel_name(int const & fd, std::string const & channel_name)
+{
+	//@ToDo add more validity checks for channel names
+	if (channel_name[0] != '#')
+	{
+		server_code_nick_text_message(fd, "479", channel_name, "Illegal channel name");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 17:00:41 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 19:25:01 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,12 @@ void	Server::JOIN(Message const & message)
 	int			fd = message.get_fd();
 	std::string	arg0 = message.get_args().at(0);
 	std::string nick = client_list.find(fd)->second.get_nickname();
+	//:42.ft_irc.local 479 Rene channel :Illegal channel name
+	if (check_channel_name(fd, arg0) == EXIT_FAILURE)
+		return ;
+
+	if (check_ban(fd, arg0, nick) == EXIT_FAILURE)
+		return ;
 
 	std::map<std::string, Channel>::iterator channel = channel_list.find(arg0);
 	if (channel == channel_list.end())
@@ -94,6 +100,8 @@ void	Server::JOIN(Message const & message)
 		channel_list.insert(std::make_pair(arg0, Channel(arg0, fd)));
 		channel = channel_list.find(arg0);
 	}
+
+
 	channel->second.add_member(fd, nick);
 
 	nick_user_host_message(fd, message.get_cmd(), arg0);
@@ -359,6 +367,73 @@ void	Server::MODE(Message const & message)
 	//TODO: Check this!
 	if (check_args(message, 1) == EXIT_FAILURE)
 		return ;
+
+	if (check_channel(message) == EXIT_FAILURE)
+		return ;
+
+	int argc = message.get_args().size();
+	if (argc > 1)
+	{
+
+		if (check_client_moderator(message) == EXIT_FAILURE)
+			return ;
+			
+		std::string flags = message.get_args().at(1);
+		if (flags.find('-') != std::string::npos && flags.find('+') != std::string::npos)
+			return ;
+
+		if ( (flags.find('o') != std::string::npos) && (argc > 2) )
+		{
+			if (check_client(message.get_fd(), message.get_args().at(2)) == EXIT_FAILURE)
+				return ;
+
+			if (check_nick_in_channel(message) == EXIT_FAILURE)
+				return ;
+				
+			std::string	channel_name = message.get_args().at(0);
+			std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+
+			std::string	nick_name = message.get_args().at(2);
+			std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+
+			if (flags.find('-') != std::string::npos)
+			{
+				channel_it->second.remove_operator(client_it->first);
+			}
+			else
+			{
+				channel_it->second.add_operator(client_it->first);
+			}
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name);
+			//nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name, "", channel_name);
+			return ;
+		}
+
+		//:42.ft_irc.local 474 rene #42 :Cannot join channel (+b)
+		if (flags.find('b') != std::string::npos)
+		{
+			if (check_client(message.get_fd(), message.get_args().at(2)) == EXIT_FAILURE)
+				return ;
+				
+			std::string	channel_name = message.get_args().at(0);
+			std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+
+			std::string	nick_name = message.get_args().at(2);
+			std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+
+			if (flags.find('-') != std::string::npos)
+			{
+				channel_it->second.remove_ban(client_it->second.get_nickname());
+			}
+			else
+			{
+				channel_it->second.add_ban(client_it->second.get_nickname());
+			}
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name);
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name, "", channel_name);
+		}
+		return ;
+	}
 	//not_implemented_yes(message);
 	// :42.ft_irc.local 324 user42 #42 +nt 
 	// :42.ft_irc.local 329 user42 #42 1663686893

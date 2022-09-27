@@ -6,7 +6,7 @@
 /*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/26 17:00:21 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 15:53:59 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ int Server::check_nick_in_channel(Message const & message)
 
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 	
-	if (channel_it->second.is_client_on_channel(message.get_fd()))
+	if (channel_it->second.is_client_on_channel(message.get_fd()) == false)
 	{
 		server_code_nick_text_message(message.get_fd(), "441", nick_name, "Not in channel");
 		return (EXIT_FAILURE);
@@ -188,7 +188,7 @@ int Server::check_client_moderator(Message const & message)
 	std::string	channel_name = message.get_args().at(0);
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
-	if (channel_it->second.is_client_is_moderator(message.get_fd()))
+	if (channel_it->second.is_client_is_moderator(message.get_fd()) == false)
 	{
 		std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
 		server_code_nick_text_message(message.get_fd(), "482", channel_name, "You are not channel operator");

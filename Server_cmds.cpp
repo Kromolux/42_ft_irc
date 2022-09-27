@@ -6,7 +6,7 @@
 /*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/26 17:08:51 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/09/27 17:00:41 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,9 @@ void	Server::JOIN(Message const & message)
 
 	//@ToDo validity check for channel names
 
-	std::string	arg0 = message.get_args().at(0);
 	int			fd = message.get_fd();
+	std::string	arg0 = message.get_args().at(0);
+	std::string nick = client_list.find(fd)->second.get_nickname();
 
 	std::map<std::string, Channel>::iterator channel = channel_list.find(arg0);
 	if (channel == channel_list.end())
@@ -93,13 +94,17 @@ void	Server::JOIN(Message const & message)
 		channel_list.insert(std::make_pair(arg0, Channel(arg0, fd)));
 		channel = channel_list.find(arg0);
 	}
-	channel->second.add_member(fd, client_list.find(fd)->second.get_nickname());
+	channel->second.add_member(fd, nick);
 
 	nick_user_host_message(fd, message.get_cmd(), arg0);
 	nick_user_host_message(fd, message.get_cmd(), arg0, arg0);
 
-	server_code_text_message(fd, "MODE", (arg0 + " +nt") );
+	if (channel->second.get_topic().empty() == false)
+	{
+		server_code_text_message(fd, "332", nick + " " + arg0, (channel->second.get_topic()));
+	}
 	
+	server_code_text_message(fd, "MODE", (arg0 + " +nt") );
 	NAMES(message);
 	
 	//std::string list = channel_list.find(arg0)->second.get_member_string_moderator();
@@ -290,6 +295,7 @@ void	Server::KICK(Message const & message)
 	channel_it->second.remove_member(client_it->first);
 
 	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick);
+	nick_user_host_message(client_it->first, message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick);
 	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick, channel_name);
 }
 
@@ -399,35 +405,28 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 	send_message_queue.push(Message(it_client->first, tmp));
 }
 
-// TODO: Finish TOPIC command
 void	Server::TOPIC(Message const & message)
 {
+	if (check_args(message, 1) == EXIT_FAILURE)
+		return ;
 
-	return;
-	// if (check_args(message, 1) == EXIT_SUCCESS)
-		
+	if (check_channel(message) == EXIT_FAILURE)
+		return ;
 
-	// if (check_channel(message) == EXIT_FAILURE)
-	// 	return ;
+	std::string	channel_name = message.get_args().at(0);
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
-	// if (check_client(message.get_fd(), message.get_args().at(1)) == EXIT_FAILURE)
-	// 	return ;
-
-	// if (check_nick_in_channel(message) == EXIT_FAILURE)
-	// 	return ;
-
-	// if (check_client_moderator(message) == EXIT_FAILURE)
-	// 	return ;
-
-	// std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
-	// std::string	channel_name = message.get_args().at(0);
-	// std::string	nick_name = message.get_args().at(1);
-	// std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
-	// std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+	//if args > 1 then change topic
+	if ( message.get_args().size() > 1 )
+	{
+		if (check_client_moderator(message) == EXIT_FAILURE)
+			return ;
+		channel_it->second.set_topic(message.get_args().at(1));
+		nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());
+		nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic(), channel_name);
+		return ;
+	}
 	
-	// channel_it->second.remove_member(client_it->first);
-
-	// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick);
-	// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + nick_name, sender_nick, channel_name);
+	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());
 }
 

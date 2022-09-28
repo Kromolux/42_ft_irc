@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 17:34:19 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 18:21:27 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	Server::USER(Message const & message)
 	}
 	else
 	{
-		server_code_nick_text_message(fd, "ZZZ", "= " + message.get_args().at(0), "Error: User already registered!");
+		server_code_nick_text_message(fd, "462", "= " + message.get_args().at(0), "User already registered!");
 	}
 	
 }
@@ -238,10 +238,10 @@ void	Server::MAP(Message const & message)
 void	Server::QUIT(Message const & message)
 {
 	//TODO: Check if it's doable with no arguments!
-	if (check_args(message, 1) == EXIT_FAILURE)
-		return ;
+	// if (check_args(message, 1) == EXIT_FAILURE)
+	// 	return ;
 	int	fd = message.get_fd();
-
+	std::string	response = "bye bye";
 	std::map<std::string, Channel>::iterator channel_it = channel_list.begin();
 	std::map<std::string, Channel>::iterator channel_ite = channel_list.end();
 	for (; channel_it != channel_ite; ++channel_it)
@@ -249,7 +249,9 @@ void	Server::QUIT(Message const & message)
 		if (channel_it->second.is_client_on_channel(fd) == true)
 		{
 			channel_it->second.remove_member(fd);
-			nick_user_host_message(fd, "QUIT", message.get_postfix(), channel_it->first);
+			if (message.get_args().size() > 0)
+				response = message.get_args().at(0);
+			nick_user_host_message(fd, "QUIT", response, channel_it->first);
 		}
 	}
 
@@ -440,20 +442,17 @@ void	Server::MODE(Message const & message)
 			std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
 
 			if (flags.find('-') != std::string::npos)
-			{
 				channel_it->second.remove_operator(client_it->first);
-			}
 			else
-			{
 				channel_it->second.add_operator(client_it->first);
-			}
+
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name);
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name, "", channel_name);
 			//return ;
 		}
 
 		//:42.ft_irc.local 474 rene #42 :Cannot join channel (+b)
-		if (flags.find('b') != std::string::npos)
+		if (flags.find('b') != std::string::npos && argc > 2)
 		{
 			if (check_client(message.get_fd(), message.get_args().at(2)) == EXIT_FAILURE)
 				return ;
@@ -462,67 +461,46 @@ void	Server::MODE(Message const & message)
 			std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
 
 			if (flags.find('-') != std::string::npos)
-			{
 				channel_it->second.remove_ban(client_it->second.get_nickname());
-			}
 			else
-			{
 				channel_it->second.add_ban(client_it->second.get_nickname());
-			}
+				
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name);
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags + " " + nick_name, "", channel_name);
 		}
 		if (flags.find('i') != std::string::npos)
 		{
 			if (flags.find('-') != std::string::npos)
-			{
 				channel_it->second.set_channel_invite_only(false);
-			}
 			else
-			{
 				channel_it->second.set_channel_invite_only(true);
-			}
+
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
 		}
 		if (flags.find('t') != std::string::npos)
 		{
 			if (flags.find('-') != std::string::npos)
-			{
 				channel_it->second.set_channel_topic_only(false);
-			}
 			else
-			{
 				channel_it->second.set_channel_topic_only(true);
-			}
+
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
 		}
 		if (flags.find('n') != std::string::npos)
 		{
 			if (flags.find('-') != std::string::npos)
-			{
 				channel_it->second.set_channel_inside_only(false);
-			}
 			else
-			{
 				channel_it->second.set_channel_inside_only(true);
-			}
-			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
-			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
+
 		}
+			// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
+			// nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
 		return ;
 	}
-	//not_implemented_yes(message);
-	// :42.ft_irc.local 324 user42 #42 +nt 
-	// :42.ft_irc.local 329 user42 #42 1663686893
-	//std::string nick = client_list.find(fd)->second.get_nickname();
-	//std::string tmp = ":" + server_name + " 324 " + nick + " " + message.get_arg() + " +nt\r\n";
-	//send_message_queue.push(Message(fd, tmp));
-	//@ToDo implement flags in return msg
-	server_code_nick_text_message(message.get_fd(), "324", (message.get_args().at(0) + " " + channel_it->second.get_channel_flags()) );
-	//tmp = ":" + server_name + " 329 " + nick + " " + message.get_arg() + "\r\n";
-	//send_message_queue.push(Message(message.get_fd(), tmp));
+	server_code_nick_text_message(message.get_fd(), "324", (message.get_args().at(0) + " " + channel_it->second.get_channel_flags()));
 	server_code_nick_text_message(message.get_fd(), "329", message.get_args().at(0));
 }
 
@@ -591,4 +569,3 @@ void	Server::TOPIC(Message const & message)
 	
 	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());
 }
-

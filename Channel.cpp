@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 18:58:57 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 13:41:18 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 Channel::Channel(std::string const & name, int const & fd) :name(name)
 {
 	moderator_list.insert(fd);
+	this->invite_only = false;
 }
 
 Channel::Channel(Channel const & other) :name(other.name)
@@ -119,3 +120,22 @@ std::map<int, std::string> const & Channel::get_member_list(void) const
 
 std::set<std::string> const	& Channel::get_ban_list(void)
 { return (this->ban_list); }
+
+void	Channel::set_channel_invite_only(bool const & invite)
+{ this->invite_only = invite; }
+
+bool	Channel::is_channel_invite_only(void)
+{ return (this->invite_only); }
+
+std::set<std::string> const	& Channel::get_invite_list(void)
+{ return (this->invite_list); }
+
+void	Channel::add_invite(std::string const & nick)
+{
+	this->invite_list.insert(nick);
+}
+
+void	Channel::remove_invite(std::string const & nick)
+{
+	this->invite_list.erase(nick);
+}

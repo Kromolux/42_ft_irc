@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 19:24:50 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 13:56:07 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,21 +136,19 @@ int	Server::check_authentication(int const & client_fd)
 	return (EXIT_SUCCESS);
 }
 
-int Server::check_channel(Message const & message)
+int Server::check_channel(int const & fd, std::string const & channel_name)
 {
-	std::string	arg0 = message.get_args().at(0);
-	int 		fd = message.get_fd();
 	
-	std::map<std::string, Channel>::iterator channel_it = channel_list.find(arg0);
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
 	if (channel_it == channel_list.end())
 	{
-		server_code_nick_text_message(fd, "402", arg0, "No such channel");
+		server_code_nick_text_message(fd, "402", channel_name, "No such channel");
 		return (EXIT_FAILURE);
 	}
 	if (!channel_it->second.is_client_on_channel(fd))
 	{
-		server_code_nick_text_message(fd, "442", arg0, "You are not on that channel");
+		server_code_nick_text_message(fd, "442", channel_name, "You are not on that channel");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -183,15 +181,15 @@ int Server::check_nick_in_channel(Message const & message)
 	return (EXIT_SUCCESS);
 }
 
-int Server::check_client_moderator(Message const & message)
+int Server::check_client_operator(int const & fd, std::string const & channel_name)
 {
-	std::string	channel_name = message.get_args().at(0);
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
-	if (channel_it->second.is_client_is_moderator(message.get_fd()) == false)
+	if (channel_it->second.is_client_is_moderator(fd) == false)
 	{
-		std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
-		server_code_nick_text_message(message.get_fd(), "482", channel_name, "You are not channel operator");
+		std::string	sender_nick = client_list.find(fd)->second.get_nickname();
+		//:42.ft_irc.local 482 Inception #999 :You are not channel operator
+		server_code_nick_text_message(fd, "482", channel_name, "You are not channel operator");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -217,5 +215,18 @@ int	Server::check_channel_name(int const & fd, std::string const & channel_name)
 		server_code_nick_text_message(fd, "479", channel_name, "Illegal channel name");
 		return (EXIT_FAILURE);
 	}
+	return (EXIT_SUCCESS);
+}
+
+int	Server::check_invite_only(int const & fd, std::string const & channel_name, std::string const & nick)
+{
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+
+	if (channel_it->second.is_channel_invite_only() == true && channel_it->second.get_invite_list().find(nick) == channel_it->second.get_invite_list().end())
+	{
+		server_code_nick_text_message(fd, "473", channel_name, "Cannot join channel (+i)");
+		return (EXIT_FAILURE);
+	}
+	channel_it->second.remove_invite(nick);
 	return (EXIT_SUCCESS);
 }

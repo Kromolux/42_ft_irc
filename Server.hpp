@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 19:24:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 13:19:04 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,12 +108,13 @@ class Server{
 		
 		int		check_args(Message const & message, size_t const & args_count);
 		int		check_authentication(int const & client_fd);
-		int		check_channel(Message const & message);
+		int		check_channel(int const & fd, std::string const & channel_name);
 		int		check_client(int const & sender_fd, std::string const & check_nick);
 		int		check_nick_in_channel(Message const & message);
-		int		check_client_moderator(Message const & message);
+		int		check_client_operator(int const & fd, std::string const & channel_name);
 		int		check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name);
 		int		check_channel_name(int const & fd, std::string const & channel_name);
+		int		check_invite_only(int const & fd, std::string const & channel_name, std::string const & nick);
 
 		//commands
 		void	PASS(Message const & message);

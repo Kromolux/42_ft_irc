@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 14:10:38 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 17:34:19 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	Server::JOIN(Message const & message)
 		server_code_text_message(fd, "332", nick + " " + arg0, (channel->second.get_topic()));
 	}
 	
-	server_code_text_message(fd, "MODE", (arg0 + " +nt") );
+	server_code_text_message(fd, "MODE", (arg0 + " " + channel->second.get_channel_flags()) );
 	NAMES(message);
 	
 	//std::string list = channel_list.find(arg0)->second.get_member_string_moderator();
@@ -154,6 +154,9 @@ void	Server::PART(Message const & message)
 		return ;
 
 	if (check_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+		return ;
+	
+	if (check_user_in_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
 	std::string	arg0 = message.get_args().at(0);
@@ -203,7 +206,7 @@ void	Server::NAMES(Message const & message)
 	if (message.get_args().empty() == false)
 	{
 		arg0 = message.get_args().at(0);
-		list = channel_list.find(arg0)->second.get_member_string_moderator();
+		list = channel_list.find(arg0)->second.get_member_string_operator();
 	}
 	server_code_nick_text_message(message.get_fd(), "353", "= " + arg0, list);
 	server_code_nick_text_message(message.get_fd(), "366", arg0, "End of /NAMES list.");
@@ -283,6 +286,9 @@ void	Server::INVITE(Message const & message)
 	if (check_channel(message.get_fd(), message.get_args().at(1)) == EXIT_FAILURE)
 		return ;
 
+	if (check_user_in_channel(message.get_fd(), message.get_args().at(1)) == EXIT_FAILURE)
+		return ;
+
 	if (check_client(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
@@ -310,6 +316,9 @@ void	Server::KICK(Message const & message)
 	if (check_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
+	if (check_user_in_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+		return ;
+
 	if (check_client(message.get_fd(), message.get_args().at(1)) == EXIT_FAILURE)
 		return ;
 
@@ -319,17 +328,23 @@ void	Server::KICK(Message const & message)
 	if (check_client_operator(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
+	std::string	reason;
 	std::string	sender_nick = client_list.find(message.get_fd())->second.get_nickname();
 	std::string	channel_name = message.get_args().at(0);
-	std::string	nick_name = message.get_args().at(1);
+	std::string	kicked_nick = message.get_args().at(1);
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
-	std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+	std::map<int, Client>::iterator client_it = get_client_by_nick(kicked_nick);
 	
 	channel_it->second.remove_member(client_it->first);
-
-	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + sender_nick, nick_name);
-	nick_user_host_message(client_it->first, message.get_cmd() + " " + channel_name + " " + sender_nick, nick_name);
-	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + sender_nick, nick_name, channel_name);
+	if (message.get_args().size() > 2)
+		reason = message.get_args().at(2);
+	else
+		reason = sender_nick;
+	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + kicked_nick, reason);
+	std::string tmp = ":" + get_nick_user_host_txt(message.get_fd()) + " " + message.get_cmd() + " " + channel_name + " " +  kicked_nick + " :" + reason + "\r\n";
+	send_message_queue.push(Message(client_it->first, tmp));
+	//nick_user_host_message(client_it->first, message.get_cmd() + " " + channel_name + " " + kicked_nick, reason);
+	nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + kicked_nick, reason, channel_name);
 }
 
 void	Server::LIST(Message const & message)
@@ -344,7 +359,7 @@ void	Server::LIST(Message const & message)
 	for (; channel_it != channel_ite ; ++channel_it)
 	{
 		number_string = number_to_string(channel_it->second.get_member_list().size());
-		server_code_nick_text_message(sender_fd, "322", channel_it->first + " " + number_string, "[+nt]");
+		server_code_nick_text_message(sender_fd, "322", channel_it->first + " " + number_string, "[" + channel_it->second.get_channel_flags() + "]");
 	}
 
 	server_code_nick_text_message(sender_fd, "323", "", "End of /LIST");
@@ -394,6 +409,9 @@ void	Server::MODE(Message const & message)
 		return ;
 
 	if (check_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+		return ;
+
+	if (check_user_in_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
 	std::string	channel_name = message.get_args().at(0);
@@ -467,6 +485,32 @@ void	Server::MODE(Message const & message)
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
 			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
 		}
+		if (flags.find('t') != std::string::npos)
+		{
+			if (flags.find('-') != std::string::npos)
+			{
+				channel_it->second.set_channel_topic_only(false);
+			}
+			else
+			{
+				channel_it->second.set_channel_topic_only(true);
+			}
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
+		}
+		if (flags.find('n') != std::string::npos)
+		{
+			if (flags.find('-') != std::string::npos)
+			{
+				channel_it->second.set_channel_inside_only(false);
+			}
+			else
+			{
+				channel_it->second.set_channel_inside_only(true);
+			}
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags);
+			nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " " + flags, "", channel_name);
+		}
 		return ;
 	}
 	//not_implemented_yes(message);
@@ -476,7 +520,7 @@ void	Server::MODE(Message const & message)
 	//std::string tmp = ":" + server_name + " 324 " + nick + " " + message.get_arg() + " +nt\r\n";
 	//send_message_queue.push(Message(fd, tmp));
 	//@ToDo implement flags in return msg
-	server_code_nick_text_message(message.get_fd(), "324", (message.get_args().at(0) + " +nt") );
+	server_code_nick_text_message(message.get_fd(), "324", (message.get_args().at(0) + " " + channel_it->second.get_channel_flags()) );
 	//tmp = ":" + server_name + " 329 " + nick + " " + message.get_arg() + "\r\n";
 	//send_message_queue.push(Message(message.get_fd(), tmp));
 	server_code_nick_text_message(message.get_fd(), "329", message.get_args().at(0));
@@ -501,9 +545,12 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 
 	if (arg0[0] == '#')
 	{
-		if (check_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+		if (check_channel(message.get_fd(), arg0) == EXIT_FAILURE)
 			return ;
 
+		std::map<std::string, Channel>::iterator channel_it = channel_list.find(arg0);
+		if (channel_it->second.is_channel_inside_only() == true && check_user_in_channel(message.get_fd(), arg0) == EXIT_FAILURE)
+			return ;
 		nick_user_host_message(message.get_fd(), type + " " +  arg0, message.get_postfix(), arg0);
 		return ;
 	}
@@ -524,14 +571,18 @@ void	Server::TOPIC(Message const & message)
 	if (check_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
 		return ;
 
+	if (check_user_in_channel(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+		return ;
+
 	std::string	channel_name = message.get_args().at(0);
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
 	//if args > 1 then change topic
 	if ( message.get_args().size() > 1 )
 	{
-		if (check_client_operator(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
-			return ;
+		if (channel_it->second.is_channel_topic_only() == true)
+			if (check_client_operator(message.get_fd(), message.get_args().at(0)) == EXIT_FAILURE)
+				return ;
 		channel_it->second.set_topic(message.get_args().at(1));
 		nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());
 		nick_user_host_message(message.get_fd(), message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic(), channel_name);

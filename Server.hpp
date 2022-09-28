@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 13:19:04 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 17:25:33 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ class Server{
 		int		check_args(Message const & message, size_t const & args_count);
 		int		check_authentication(int const & client_fd);
 		int		check_channel(int const & fd, std::string const & channel_name);
+		int		check_user_in_channel(int const & fd, std::string const & channel_name);
 		int		check_client(int const & sender_fd, std::string const & check_nick);
 		int		check_nick_in_channel(Message const & message);
 		int		check_client_operator(int const & fd, std::string const & channel_name);

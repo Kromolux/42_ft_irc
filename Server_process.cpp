@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 13:56:07 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/28 17:25:14 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,13 @@ int Server::check_channel(int const & fd, std::string const & channel_name)
 		server_code_nick_text_message(fd, "402", channel_name, "No such channel");
 		return (EXIT_FAILURE);
 	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::check_user_in_channel(int const & fd, std::string const & channel_name)
+{
+	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
+	
 	if (!channel_it->second.is_client_on_channel(fd))
 	{
 		server_code_nick_text_message(fd, "442", channel_name, "You are not on that channel");
@@ -185,7 +192,7 @@ int Server::check_client_operator(int const & fd, std::string const & channel_na
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
-	if (channel_it->second.is_client_is_moderator(fd) == false)
+	if (channel_it->second.is_client_is_operator(fd) == false)
 	{
 		std::string	sender_nick = client_list.find(fd)->second.get_nickname();
 		//:42.ft_irc.local 482 Inception #999 :You are not channel operator

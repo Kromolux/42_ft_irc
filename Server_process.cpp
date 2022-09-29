@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 17:25:14 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 11:22:06 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	Server::process_messages(void)
 /*<nick>!<user>@<host>*/
 std::string Server::get_nick_user_host_txt(int const & fd)
 {
-	Client	that_client = client_list.find(fd)->second;
+	Client	& that_client = client_list.find(fd)->second;
 	std::string nick = that_client.get_nickname();
 	std::string user = that_client.get_username();
 	std::string host = that_client.get_hostname();

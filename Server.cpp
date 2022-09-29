@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 13:51:36 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 11:38:30 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ Server::Server(int const & port, char const * password)
 {
 	this->port = port;
 	this->password = password;
-	this->server_name = "42.ft_irc";
+	this->server_name = "ft_irc@42wolfsburg.de";
 	this->motd = "Welcome to our 42 Wolfsburg IRC server.";
 	this->version = "ver. 0.0.1";
-	this->user_modes = "no user modes yet";
-	this->channel_modes = "no channel modes yet";
+	this->user_modes = "i";
+	this->channel_modes = "oitnb";
 }
 
 Server::Server(Server const & other) :hostname(other.hostname)
@@ -82,9 +82,10 @@ void	Server::run_server(void)
 		this->returnAccept = accept(this->serverSocket, (struct sockaddr *) &client, &client_number);
 		if (this->returnAccept > 0)
 		{
-			std::cout << "accept = " << returnAccept << " client = " << ntohs(client.sin_port) << " - " << client.sin_family <<"\n"
-						<< inet_ntoa(client.sin_addr) << "\n"; //@ToDo how to get the client hostname?
-			this->client_list.insert(std::make_pair(returnAccept, Client(returnAccept)));
+			std::cout << "accept = " << returnAccept << " client = " << inet_ntoa(client.sin_addr) << "\n"; //@ToDo how to get the client hostname?
+			std::map<int, Client>::iterator client_it;
+			client_it = (client_list.insert(std::make_pair(returnAccept, Client(returnAccept)))).first;
+			client_it->second.set_hostname(std::string(inet_ntoa(client.sin_addr)));
 			this->update_pollfd();
 		}
 

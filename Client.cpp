@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 16:13:58 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 16:24:57 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 11:25:33 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,17 @@
 Client::Client(int const & fd) :fd(fd), nickname(""), username(""), authenticated(false), succesfully_reg(false)
 {}
 
-Client::Client(Client const & other) :fd(other.fd), nickname(other.nickname), username(other.username), message_buffer(""), succesfully_reg(false)
-{}
+Client::Client(Client const & other)
+{
+	this->fd = other.fd;
+	this->nickname = other.nickname;
+	this->username = other.username;
+	this->realname = other.realname;
+	this->hostname = other.hostname;
+	this->message_buffer = other.message_buffer;
+	this->authenticated = other.authenticated;
+	this->succesfully_reg = other.succesfully_reg;
+}
 
 Client & Client::operator=(Client const & rhs)
 {

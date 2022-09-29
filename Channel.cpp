@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 17:42:41 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 13:27:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,17 +160,18 @@ void	Channel::set_channel_inside_only(bool const & inside)
 bool	Channel::is_channel_inside_only(void) const
 { return (this->inside_only); }
 
+//itnb
 std::string const Channel::get_channel_flags(void) const
 {
 	std::string tmp;
 
 	if (this->topic_only || this->inside_only || this->invite_only)
 		tmp += "+";
-	if (this->inside_only)
-		tmp += "n";
-	if (this->topic_only)
-		tmp += "t";
 	if (this->invite_only)
 		tmp += "i";
+	if (this->topic_only)
+		tmp += "t";
+	if (this->inside_only)
+		tmp += "n";
 	return (tmp);
 }

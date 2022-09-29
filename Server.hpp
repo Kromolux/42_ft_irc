@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/28 17:25:33 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 12:28:58 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ class Server{
 
 		std::map<int, Client>::iterator	get_client_by_nick(std::string const & nick);
 		int		get_client_fd(std::string const & nickname);
+		Client *get_client_obj(int const & fd);
 		bool	is_nick_available(std::string const & nick);
 		void	register_client(Message const & message);
 		

@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 11:38:30 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 12:31:34 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,14 @@ int	Server::get_client_fd(std::string const & nickname)
 			return (it->first);
 	}
 	return (0);
+}
+
+Client *Server::get_client_obj(int const & fd)
+{
+	std::map<int, Client>::iterator client_it = client_list.find(fd);
+	if (client_it != client_list.end())
+		return (&client_it->second);
+	return (NULL);
 }
 
 bool	Server::is_nick_available(std::string const & nick)

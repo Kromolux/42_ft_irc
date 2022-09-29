@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+         #
+#    By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/26 11:56:29 by ehosu            ###   ########.fr        #
+#    Updated: 2022/09/29 18:30:04 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,15 +28,15 @@ SRCS		:=	main.cpp \
 
 OBJS		:=	$(SRCS:%.cpp=%.o)
 
-CFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
+CFLAGS		=	-Wall -Wextra -Werror -std=c++98
 DFLAG		:=	-g -D DEBUG=1
 
 PORT		:=	4242
 
 PASS		:=	Wolfsburg
 
-all:
-	make -j $(NAME)
+all:	$(NAME)
+#	make -j	$(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
@@ -46,7 +46,7 @@ $(OBJS): %.o: %.cpp
 
 debug: CFLAGS += $(DFLAG)
 debug: re
-	./$(NAME)
+	./$(NAME) $(PORT) $(PASS)
 
 clean:
 	rm -fr $(OBJS)

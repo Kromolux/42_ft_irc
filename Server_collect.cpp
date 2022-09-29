@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 15:44:05 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:21:17 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,15 @@ void	Server::collect_messages(void)
 			{
 				this->client_list.erase(clients_pollfd[i].fd);
 				close(clients_pollfd[i].fd);
-				std::cout << clients_pollfd[i].fd << " client disconnected\n";
+				#if (DEBUG)
+					std::cout << COLOR_PURPLE << clients_pollfd[i].fd << " client disconnected\n" << COLOR_DEFAULT;
+				#endif
 				continue;
 			}
 			buffer[recv_size] = '\0';
-			std::cout << "recv = " << recv_size << " fd = " << clients_pollfd[i].fd << " " << client_list.find(clients_pollfd[i].fd)->second.get_nickname() << " [" << buffer << "]\n";
+			#if (DEBUG)
+				std::cout << COLOR_PURPLE << "recv = " << recv_size << " <= " << clients_pollfd[i].fd << " " << client_list.find(clients_pollfd[i].fd)->second.get_nickname() << " [" << COLOR_WHITE << buffer << COLOR_PURPLE << "]\n" << COLOR_DEFAULT;
+			#endif
 			this->store_message(clients_pollfd[i].fd, buffer);
 		}
 	}

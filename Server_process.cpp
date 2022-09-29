@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 16:03:19 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:22:50 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ void	Server::process_messages(void)
 	{
 		Message & process_message = received_message_queue.front();
 		process_message.parse();
-		process_message.print_message();
+		#if (DEBUG)
+			process_message.print_message();
+		#endif
 		executed_cmd = false;
 		cmd = process_message.get_cmd();
 
@@ -145,7 +147,7 @@ void Server::nick_user_host_message(int const & fd, std::string const & code, st
 }
 
 
-int Server::check_args(Message const & message, size_t const & args_count)
+int Server::check_args_count(Message const & message, size_t const & args_count)
 {
 	if (message.get_args().size() < args_count)
 	{
@@ -188,7 +190,7 @@ int	Server::check_registration(int const & client_fd)
 }
 
 
-int Server::check_channel(int const & fd, std::string const & channel_name)
+int Server::check_channel_exists(int const & fd, std::string const & channel_name)
 {
 	
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
@@ -202,7 +204,7 @@ int Server::check_channel(int const & fd, std::string const & channel_name)
 }
 
 
-int Server::check_user_in_channel(int const & fd, std::string const & channel_name)
+int Server::check_client_in_channel(int const & fd, std::string const & channel_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 	
@@ -215,7 +217,7 @@ int Server::check_user_in_channel(int const & fd, std::string const & channel_na
 }
 
 
-int Server::check_client(int const & sender_fd, std::string const & check_nick)
+int Server::check_nick_exists(int const & sender_fd, std::string const & check_nick)
 {
 	std::map<int, Client>::iterator client_it = get_client_by_nick(check_nick);
 
@@ -227,24 +229,25 @@ int Server::check_client(int const & sender_fd, std::string const & check_nick)
 	return (EXIT_SUCCESS);
 }
 
-
-int Server::check_nick_in_channel(Message const & message)
+/* in case of EXIT_FAILURE = server_code_nick_text_message(fd, "441", nick_name, "Not in channel"); 
+@param fd int fd of requesting client
+@param channel_name 
+@param nick_name
+*/
+int Server::check_nick_in_channel(int const & fd, std::string const & channel_name, std::string const & nick_name)
 {
-	std::string	channel_name = message.get_args().at(0);
-	std::string	nick_name = message.get_args().at(1);
-
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 	
-	if (channel_it->second.is_client_on_channel(message.get_fd()) == false)
+	if (channel_it->second.is_client_on_channel(fd) == false)
 	{
-		server_code_nick_text_message(message.get_fd(), "441", nick_name, "Not in channel");
+		server_code_nick_text_message(fd, "441", nick_name, "Not in channel");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
 
-int Server::check_client_operator(int const & fd, std::string const & channel_name)
+int Server::check_client_is_operator(int const & fd, std::string const & channel_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
@@ -259,7 +262,7 @@ int Server::check_client_operator(int const & fd, std::string const & channel_na
 }
 
 
-int	Server::check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name)
+int	Server::check_nick_is_banned(int const & fd, std::string const & channel_name, std::string const & nick_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 	

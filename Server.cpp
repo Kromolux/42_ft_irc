@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 15:30:55 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:20:32 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,19 @@ Server & Server::operator=(Server const & rhs)
 	return (*this);
 }
 
+
 Server::~Server(void)
 {
-	std::cout << "good bye!\n";
+	std::cout << COLOR_GREEN << "IRC Server stopped and shut down...\n" << COLOR_DEFAULT;
 }
+
 
 int	Server::return_error(std::string const & error_text)
 {
-	std::cerr << "ERROR! " << error_text << errno << "\n";
+	std::cerr << COLOR_RED << "ERROR! " << error_text << errno << "\n" << COLOR_DEFAULT;
 	return (EXIT_FAILURE);
 }
+
 
 int	Server::init_server(void)
 {
@@ -89,21 +92,43 @@ void	Server::run_server(void)
 			this->return_accept = accept(this->server_socket, (struct sockaddr *) &client, &client_number);
 			if (this->return_accept > 0)
 			{
-				std::cout << "accept = " << this->return_accept << " client = " << inet_ntoa(client.sin_addr) << "\n"; //@ToDo how to get the client hostname?
-				std::map<int, Client>::iterator client_it;
-				client_it = (client_list.insert(std::make_pair(this->return_accept, Client(this->return_accept)))).first;
-				client_it->second.set_hostname(std::string(inet_ntoa(client.sin_addr)));
-				update_pollfd();
+				#if (DEBUG)
+					std::cout << COLOR_PURPLE << "new client connected accept = " << this->return_accept << " IP = " << inet_ntoa(client.sin_addr) << "\n" << COLOR_DEFAULT; //@ToDo how to get the client hostname?
+				#endif
+				if (clients_size < MAX_CLIENTS)
+				{
+					std::map<int, Client>::iterator client_it;
+					client_it = (client_list.insert(std::make_pair(this->return_accept, Client(this->return_accept)))).first;
+					client_it->second.set_hostname(std::string(inet_ntoa(client.sin_addr)));
+					update_pollfd();
+				}
+				else
+				{
+					std::string tmp = ":" + this->server_name + " 519 * :Too many clients on server, try again later\r\n";
+					#if (DEBUG)
+						std::cout << COLOR_PURPLE << "send msg => " << return_accept << COLOR_YELLOW << tmp << COLOR_DEFAULT;
+					#endif
+					send(return_accept, tmp.c_str(), tmp.length(), MSG_DONTWAIT);
+					close(return_accept);
+				}
 			}
 		}
-		std::cout << "===< collect messages >===\n";
+		#if (DEBUG)
+			std::cout << COLOR_YELLOW << "===< collect messages >===\n" << COLOR_DEFAULT;
+		#endif
 		this->collect_messages();
-		std::cout << "===< process messages >===\n";
+		#if (DEBUG)
+			std::cout << COLOR_YELLOW << "===< process messages >===\n" << COLOR_DEFAULT;
+		#endif
 		this->process_messages();
-		std::cout << "===< distribute messages >===\n";
+		#if (DEBUG)
+			std::cout << COLOR_YELLOW << "===< distribute messages >===\n" << COLOR_DEFAULT;
+		#endif
 		this->distribute_messages();
-		std::cout << "===< wait for new messages >===\n";
-		if (clients_size != static_cast<int>(client_list.size()))
+		#if (DEBUG)
+			std::cout << COLOR_YELLOW << "===< wait for new messages >===\n" << COLOR_DEFAULT;
+		#endif
+		if (clients_size != static_cast<int>(client_list.size()) + 1)
 			update_pollfd();
 	}
 }
@@ -114,6 +139,7 @@ void	Server::stop_server(void)
 	for (int i = 0; i < clients_size; ++i)
 		close(clients_pollfd[i].fd);
 }
+
 
 void	Server::update_pollfd(void)
 {
@@ -130,8 +156,9 @@ void	Server::update_pollfd(void)
 		clients_pollfd[i].events = POLLIN;
 		clients_pollfd[i].revents = 0;
 	}
-	std::cout << "client size = " << clients_size << "\n";
+	//std::cout << "client size = " << clients_size << "\n";
 }
+
 
 int	Server::get_client_fd(std::string const & nickname)
 {
@@ -145,6 +172,7 @@ int	Server::get_client_fd(std::string const & nickname)
 	return (0);
 }
 
+
 Client *Server::get_client_obj(int const & fd)
 {
 	std::map<int, Client>::iterator client_it = client_list.find(fd);
@@ -152,6 +180,7 @@ Client *Server::get_client_obj(int const & fd)
 		return (&client_it->second);
 	return (NULL);
 }
+
 
 bool	Server::is_nick_available(std::string const & nick)
 {
@@ -179,6 +208,7 @@ void	Server::register_client(Message const & message)
 	MOTD(message);
 	nick_user_host_message(fd, "MODE " + this->client_list.find(fd)->second.get_nickname(), "+i");
 }
+
 
 std::map<int, Client>::iterator	Server::get_client_by_nick(std::string const & nick)
 {

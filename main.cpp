@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 15:50:55 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/21 17:17:16 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:19:31 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 #include <signal.h>
 
 #include "Server.hpp"
+#include "colors.h"
+#ifndef DEBUG
+# define DEBUG 0
+#endif
 
 bool server_run = true;
 
@@ -33,7 +37,7 @@ void	sigint(int sign)
 	if (sign == SIGINT)
 	{
 		server_run = false;
-		std::cout << "SIGINT signal handler called!\n";
+		std::cout << COLOR_PURPLE << "SIGINT signal handler called!\n" << COLOR_DEFAULT;
 	}
 }
 
@@ -41,18 +45,18 @@ int main(int argc, char **argv)
 {
 	if (argc != 3)
 	{
-		std::cerr << "Invalid number of arguments!\n <port> <password>\n";
+		std::cerr << COLOR_RED << "Invalid number of arguments!\n <port> <password>\n" << COLOR_DEFAULT;
 		return (EXIT_FAILURE);
 	}
 	if (isInt(argv[1]) == false)
 	{
-		std::cerr << "Invalid port as first argument!\n 0 - 65535\n";
+		std::cerr << COLOR_RED << "Invalid port as first argument!\n 0 - 65535\n" << COLOR_DEFAULT;
 		return (EXIT_FAILURE);
 	}
 	int port = std::atoi(argv[1]);
 	if (port < 0 || port > 65535)
 	{
-		std::cerr << "Invalid port number!\n 0 - 65535\n";
+		std::cerr << COLOR_RED << "Invalid port number!\n 0 - 65535\n" << COLOR_DEFAULT;
 		return (EXIT_FAILURE);
 	}
 	signal(SIGINT, &sigint);
@@ -61,7 +65,7 @@ int main(int argc, char **argv)
 	if (IRC_Server.init_server() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-	std::cout << "Server is up and running\n";
+	std::cout << COLOR_GREEN << "IRC Server is up and running...\n" << COLOR_DEFAULT;
 
 	while (server_run)
 		IRC_Server.run_server();

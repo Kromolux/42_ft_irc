@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 13:58:31 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 16:59:18 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /* PASS <password> */
 void	Server::PASS(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 	
 	if (message.get_args().at(0) == this->password)
@@ -30,7 +30,7 @@ void	Server::PASS(Message const & message)
 /*NICK <nickname> [ <hopcount> ]*/
 void	Server::NICK(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	int	const &			fd = message.get_fd();
@@ -60,7 +60,7 @@ void	Server::NICK(Message const & message)
 /*USER <username> <hostname> <servername> :<realname> */
 void	Server::USER(Message const & message)
 {
-	if (check_args(message, 4) == EXIT_FAILURE)
+	if (check_args_count(message, 4) == EXIT_FAILURE)
 		return ;
 
 	int	const & fd = message.get_fd();
@@ -90,7 +90,7 @@ void	Server::USER(Message const & message)
 /* JOIN <channel>{,<channel>} [<key>{,<key>}] */
 void	Server::JOIN(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	//@ToDo validity check for channel names
@@ -114,7 +114,7 @@ void	Server::JOIN(Message const & message)
 		channel = channel_list.find(channel_name);
 	}
 
-	if (check_ban(fd, channel_name, nick) == EXIT_FAILURE)
+	if (check_nick_is_banned(fd, channel_name, nick) == EXIT_FAILURE)
 		return ;
 	
 	if (check_invite_only(fd, channel_name, nick) == EXIT_FAILURE)
@@ -144,7 +144,7 @@ void	Server::PRIVMSG(Message const & message)
 
 void	Server::PING(Message const & message)
 {
-	// if (check_args(message, 1) == EXIT_FAILURE)
+	// if (check_args_count(message, 1) == EXIT_FAILURE)
 	// 	return ;
 	std::string	arg0;
 	if(message.get_args().size() > 0)
@@ -167,16 +167,16 @@ void	Server::AWAY(Message const & message)
 /* PART <channel>{,<channel>} */
 void	Server::PART(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	int const &			fd = message.get_fd();
 	std::string	const &	channel_name = message.get_args().at(0);
 
-	if (check_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_channel_exists(fd, channel_name) == EXIT_FAILURE)
 		return ;
 	
-	if (check_user_in_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_in_channel(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
 	std::map<std::string, Channel>::iterator	channel_it = channel_list.find(channel_name);
@@ -223,7 +223,7 @@ void	Server::WHOWAS(Message const & message)
 
 void	Server::NAMES(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	std::string arg0;
@@ -268,7 +268,7 @@ void	Server::MAP(Message const & message)
 void	Server::QUIT(Message const & message)
 {
 	//TODO: Check if it's doable with no arguments!
-	// if (check_args(message, 1) == EXIT_FAILURE)
+	// if (check_args_count(message, 1) == EXIT_FAILURE)
 	// 	return ;
 	int	const &		fd = message.get_fd();
 	std::string	response = "bye bye";
@@ -316,23 +316,23 @@ void	Server::ADMIN(Message const & message)
 /* INVITE <user> <channel> */
 void	Server::INVITE(Message const & message)
 {
-	if (check_args(message, 2) == EXIT_FAILURE)
+	if (check_args_count(message, 2) == EXIT_FAILURE)
 		return ;
 
 	int	const &			fd = message.get_fd();
 	std::string	const &	nick_name = message.get_args().at(0);
 	std::string	const &	channel_name = message.get_args().at(1);
 
-	if (check_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_channel_exists(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_user_in_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_in_channel(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_client(fd, nick_name) == EXIT_FAILURE)
+	if (check_nick_exists(fd, nick_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_client_operator(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_is_operator(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
 	std::string	const &	sender_nick = client_list.find(fd)->second.get_nickname();
@@ -349,26 +349,26 @@ void	Server::INVITE(Message const & message)
 /* KICK <channel> <user> [<comment>] */
 void	Server::KICK(Message const & message)
 {
-	if (check_args(message, 2) == EXIT_FAILURE)
+	if (check_args_count(message, 2) == EXIT_FAILURE)
 		return ;
 
 	int	const &			fd = message.get_fd();
 	std::string const &	channel_name = message.get_args().at(0);
 	std::string const &	kicked_nick = message.get_args().at(1);
 
-	if (check_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_channel_exists(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_user_in_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_in_channel(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_client(fd, kicked_nick) == EXIT_FAILURE)
+	if (check_nick_exists(fd, kicked_nick) == EXIT_FAILURE)
 		return ;
 
-	if (check_nick_in_channel(message) == EXIT_FAILURE)
+	if (check_nick_in_channel(fd, channel_name, kicked_nick) == EXIT_FAILURE)
 		return ;
 
-	if (check_client_operator(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_is_operator(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
 	std::string	reason;
@@ -451,17 +451,17 @@ void	Server::SETNAME(Message const & message)
 void	Server::MODE(Message const & message)
 {
 	//TODO: Check this!
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	int	const &			argc = message.get_args().size();
 	int	const &			fd = message.get_fd();
 	std::string	const &	channel_or_nick = message.get_args().at(0);
 	
-	if (check_channel(fd, channel_or_nick) == EXIT_FAILURE)
+	if (check_channel_exists(fd, channel_or_nick) == EXIT_FAILURE)
 		return ;
 
-	if (check_user_in_channel(fd, channel_or_nick) == EXIT_FAILURE)
+	if (check_client_in_channel(fd, channel_or_nick) == EXIT_FAILURE)
 		return ;
 
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_or_nick);
@@ -469,7 +469,7 @@ void	Server::MODE(Message const & message)
 	if (argc > 1)
 	{
 
-		if (check_client_operator(fd, channel_or_nick) == EXIT_FAILURE)
+		if (check_client_is_operator(fd, channel_or_nick) == EXIT_FAILURE)
 			return ;
 			
 		std::string const &	flags = message.get_args().at(1);
@@ -478,14 +478,14 @@ void	Server::MODE(Message const & message)
 
 		if ( (flags.find('o') != std::string::npos) && (argc > 2) )
 		{
-			if (check_client(fd, message.get_args().at(2)) == EXIT_FAILURE)
-				return ;
-
-			if (check_nick_in_channel(message) == EXIT_FAILURE)
+			if (check_nick_exists(fd, message.get_args().at(2)) == EXIT_FAILURE)
 				return ;
 
 			std::string	const & nick_name = message.get_args().at(2);
 			std::map<int, Client>::iterator client_it = get_client_by_nick(nick_name);
+
+			if (check_nick_in_channel(fd, channel_or_nick, nick_name) == EXIT_FAILURE)
+				return ;
 
 			if (flags.find('-') != std::string::npos)
 				channel_it->second.remove_operator(client_it->first);
@@ -500,7 +500,7 @@ void	Server::MODE(Message const & message)
 		//:42.ft_irc.local 474 rene #42 :Cannot join channel (+b)
 		if (flags.find('b') != std::string::npos && argc > 2)
 		{
-			if (check_client(fd, message.get_args().at(2)) == EXIT_FAILURE)
+			if (check_nick_exists(fd, message.get_args().at(2)) == EXIT_FAILURE)
 				return ;
 
 			std::string	const &	nick_name = message.get_args().at(2);
@@ -565,7 +565,7 @@ void	Server::not_implemented_yes(Message const & message)
 
 void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 {
-	if (check_args(message, 2) == EXIT_FAILURE)
+	if (check_args_count(message, 2) == EXIT_FAILURE)
 		return ;
 
 	int	const &			fd = message.get_fd();
@@ -573,17 +573,17 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 
 	if (channel_or_nick[0] == '#')
 	{
-		if (check_channel(message.get_fd(), channel_or_nick) == EXIT_FAILURE)
+		if (check_channel_exists(message.get_fd(), channel_or_nick) == EXIT_FAILURE)
 			return ;
 
 		std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_or_nick);
-		if (channel_it->second.is_channel_inside_only() == true && check_user_in_channel(fd, channel_or_nick) == EXIT_FAILURE)
+		if (channel_it->second.is_channel_inside_only() == true && check_client_in_channel(fd, channel_or_nick) == EXIT_FAILURE)
 			return ;
 		nick_user_host_message(fd, type + " " +  channel_or_nick, message.get_postfix(), channel_or_nick);
 		return ;
 	}
 	
-	if (check_client(fd, channel_or_nick) == EXIT_FAILURE)
+	if (check_nick_exists(fd, channel_or_nick) == EXIT_FAILURE)
 		return ;
 
 	std::map<int, Client>::iterator		it_client = get_client_by_nick(channel_or_nick);
@@ -593,16 +593,16 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 
 void	Server::TOPIC(Message const & message)
 {
-	if (check_args(message, 1) == EXIT_FAILURE)
+	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
 	int	const &			fd = message.get_fd();
 	std::string	const &	channel_name = message.get_args().at(0);
 	
-	if (check_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_channel_exists(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
-	if (check_user_in_channel(fd, channel_name) == EXIT_FAILURE)
+	if (check_client_in_channel(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
@@ -611,7 +611,7 @@ void	Server::TOPIC(Message const & message)
 	if ( message.get_args().size() > 1 )
 	{
 		if (channel_it->second.is_channel_topic_only() == true)
-			if (check_client_operator(fd, channel_name) == EXIT_FAILURE)
+			if (check_client_is_operator(fd, channel_name) == EXIT_FAILURE)
 				return ;
 		channel_it->second.set_topic(message.get_args().at(1));
 		nick_user_host_message(fd, message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());

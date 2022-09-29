@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 15:42:20 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:00:38 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@
 #include "Message.hpp"
 #include "Channel.hpp"
 
+#include "colors.h"
+
 class Server{
 	
 	public:
@@ -53,7 +55,7 @@ class Server{
 		Server(Server const & other);
 		Server & operator=(Server const & rhs);
 
-		static const int		MAX_CLIENTS = 64;
+		static const int		MAX_CLIENTS = 3;
 		static const ssize_t	BUFFER_SIZE = 1024;
 
 		std::string				server_name;
@@ -89,7 +91,7 @@ class Server{
 		void	update_pollfd(void);
 
 		std::map<int, Client>::iterator	get_client_by_nick(std::string const & nick);
-		int		get_client_fd(std::string const & nickname);
+		int		get_client_fd(std::string const & nick_name);
 		Client *get_client_obj(int const & fd);
 		bool	is_nick_available(std::string const & nick);
 		void	register_client(Message const & message);
@@ -107,15 +109,15 @@ class Server{
 		void	server_code_message(std::string const & nick_server, int const & fd, std::string const & code, std::string const & text, std::string const & postfix);
 		void 	nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix = "", std::string const & receiver = "");
 		
-		int		check_args(Message const & message, size_t const & args_count);
-		int		check_authentication(int const & client_fd);
-		int		check_registration(int const & client_fd);
-		int		check_channel(int const & fd, std::string const & channel_name);
-		int		check_user_in_channel(int const & fd, std::string const & channel_name);
-		int		check_client(int const & sender_fd, std::string const & check_nick);
-		int		check_nick_in_channel(Message const & message);
-		int		check_client_operator(int const & fd, std::string const & channel_name);
-		int		check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name);
+		int		check_args_count(Message const & message, size_t const & args_count);
+		int		check_authentication(int const & fd);
+		int		check_registration(int const & fd);
+		int		check_channel_exists(int const & fd, std::string const & channel_name);
+		int		check_client_in_channel(int const & fd, std::string const & channel_name);
+		int		check_nick_exists(int const & fd, std::string const & check_nick);
+		int		check_nick_in_channel(int const & fd, std::string const & channel_name, std::string const & nick_name);
+		int		check_client_is_operator(int const & fd, std::string const & channel_name);
+		int		check_nick_is_banned(int const & fd, std::string const & channel_name, std::string const & nick_name);
 		int		check_channel_name(int const & fd, std::string const & channel_name);
 		int		check_invite_only(int const & fd, std::string const & channel_name, std::string const & nick);
 

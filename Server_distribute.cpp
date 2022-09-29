@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_distribute.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 22:35:26 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 14:01:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	Server::distribute_messages(void)
 	}
 }
 
+
 void	Server::send_channel_message(Channel const & channel, Message const & message)
 {
 	std::map<int, std::string>::const_iterator it = channel.get_member_list().begin();
@@ -44,6 +45,7 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 		}
 	}
 }
+
 
 void	Server::send_message(Message const & message)
 {

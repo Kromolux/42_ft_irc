@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 11:22:06 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 14:00:53 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	Server::process_messages(void)
 {
-	const int	CMDS_SIZE = 31;
+	int	const CMDS_SIZE = 31;
 	bool		executed_cmd = false;
 
 	std::string const CMDS[CMDS_SIZE] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "PING", "AWAY", "PART", \
@@ -56,6 +56,7 @@ void	Server::process_messages(void)
 	}
 }
 
+
 /*<nick>!<user>@<host>*/
 std::string Server::get_nick_user_host_txt(int const & fd)
 {
@@ -67,6 +68,7 @@ std::string Server::get_nick_user_host_txt(int const & fd)
 	return (tmp);
 }
 
+
 /*:<server> <code> <nick> [ <text> ] [ :<postfix> ]*/
 void	Server::server_code_nick_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix)
 {
@@ -74,17 +76,20 @@ void	Server::server_code_nick_text_message(int const & fd, std::string const & c
 	server_code_message(nick, fd, code, text, postfix);
 }
 
+
 /*:<server> <code> <server> [ <text> ] [ :<postfix> ]*/
 void	Server::server_code_server_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix)
 {
 	server_code_message(server_name, fd, code, text, postfix);
 }
 
+
 /*:<server> <code> [ <text> ] [ :<postfix> ]*/
 void	Server::server_code_text_message(int const & fd, std::string const & code, std::string const & text, std::string const & postfix)
 {
 	server_code_message("", fd, code, text, postfix);
 }
+
 
 void	Server::server_code_message(std::string const & nick_server, int const & fd, std::string const & code, std::string const & text, std::string const & postfix)
 {
@@ -99,6 +104,7 @@ void	Server::server_code_message(std::string const & nick_server, int const & fd
 	send_message_queue.push(Message(fd, msg));
 }
 
+
 //:user42!user42@i.love.debian.org MODE user42 :+i
 /*:<nick>!<user>@<host> <code> [ :<postfix> ]*/
 void Server::nick_user_host_message(int const & fd, std::string const & code, std::string const & postfix, std::string const & receiver)
@@ -111,6 +117,7 @@ void Server::nick_user_host_message(int const & fd, std::string const & code, st
 	send_message_queue.push(Message(fd, msg, receiver));
 }
 
+
 int Server::check_args(Message const & message, size_t const & args_count)
 {
 	if (message.get_args().size() < args_count)
@@ -120,6 +127,7 @@ int Server::check_args(Message const & message, size_t const & args_count)
 	}
 	return (EXIT_SUCCESS);
 }
+
 
 int	Server::check_authentication(int const & client_fd)
 {
@@ -136,6 +144,7 @@ int	Server::check_authentication(int const & client_fd)
 	return (EXIT_SUCCESS);
 }
 
+
 int Server::check_channel(int const & fd, std::string const & channel_name)
 {
 	
@@ -149,6 +158,7 @@ int Server::check_channel(int const & fd, std::string const & channel_name)
 	return (EXIT_SUCCESS);
 }
 
+
 int Server::check_user_in_channel(int const & fd, std::string const & channel_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
@@ -161,6 +171,7 @@ int Server::check_user_in_channel(int const & fd, std::string const & channel_na
 	return (EXIT_SUCCESS);
 }
 
+
 int Server::check_client(int const & sender_fd, std::string const & check_nick)
 {
 	std::map<int, Client>::iterator client_it = get_client_by_nick(check_nick);
@@ -172,6 +183,7 @@ int Server::check_client(int const & sender_fd, std::string const & check_nick)
 	}
 	return (EXIT_SUCCESS);
 }
+
 
 int Server::check_nick_in_channel(Message const & message)
 {
@@ -188,6 +200,7 @@ int Server::check_nick_in_channel(Message const & message)
 	return (EXIT_SUCCESS);
 }
 
+
 int Server::check_client_operator(int const & fd, std::string const & channel_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
@@ -202,6 +215,7 @@ int Server::check_client_operator(int const & fd, std::string const & channel_na
 	return (EXIT_SUCCESS);
 }
 
+
 int	Server::check_ban(int const & fd, std::string const & channel_name, std::string const & nick_name)
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
@@ -214,6 +228,7 @@ int	Server::check_ban(int const & fd, std::string const & channel_name, std::str
 	return (EXIT_SUCCESS);
 }
 
+
 int	Server::check_channel_name(int const & fd, std::string const & channel_name)
 {
 	//@ToDo add more validity checks for channel names
@@ -224,6 +239,7 @@ int	Server::check_channel_name(int const & fd, std::string const & channel_name)
 	}
 	return (EXIT_SUCCESS);
 }
+
 
 int	Server::check_invite_only(int const & fd, std::string const & channel_name, std::string const & nick)
 {

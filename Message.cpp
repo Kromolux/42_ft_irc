@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/22 21:18:16 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:39:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,10 +122,10 @@ bool	Message::receiver_is_channel(void) const
 
 std::string const & Message::print_message(void) const
 {
-	std::cout	<< "fd: [" << this->fd << "]\n"
-				<< "prefix: [" << this->prefix << "]\n"
-				<< "cmd: [" << this->cmd << "]\n";
+	std::cout	<< COLOR_GREEN << "fd: [" << COLOR_WHITE << this->fd << COLOR_GREEN << "]\n"
+				<< COLOR_GREEN << "prefix: [" << COLOR_WHITE << this->prefix << COLOR_GREEN << "]\n"
+				<< COLOR_GREEN << "cmd: [" << COLOR_WHITE << this->cmd << COLOR_GREEN << "]\n";
 	for (int i = 0, end = this->args.size(); i < end; ++i)
-		std::cout << "args_" << i << " [" << this->args.at(i) << "]\n";
+		std::cout << COLOR_GREEN << "args_" << i << " [" << COLOR_WHITE << this->args.at(i) << COLOR_GREEN << "]\n" << COLOR_DEFAULT;
 	return (this->raw);
 }

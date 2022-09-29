@@ -6,7 +6,7 @@
 #    By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/29 18:30:04 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/09/29 18:32:53 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,4 +65,4 @@ leak:
 start:
 	./$(NAME) $(PORT) $(PASS)
 
-.PHONY: clean fclean re
+.PHONY: clean fclean re val leak debug start

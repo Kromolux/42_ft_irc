@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:21:17 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:40:21 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	Server::collect_messages(void)
 				this->client_list.erase(clients_pollfd[i].fd);
 				close(clients_pollfd[i].fd);
 				#if (DEBUG)
-					std::cout << COLOR_PURPLE << clients_pollfd[i].fd << " client disconnected\n" << COLOR_DEFAULT;
+					std::cout << COLOR_GREEN << clients_pollfd[i].fd << " client disconnected\n" << COLOR_DEFAULT;
 				#endif
 				continue;
 			}

@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:20:32 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:42:10 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	Server::run_server(void)
 			if (this->return_accept > 0)
 			{
 				#if (DEBUG)
-					std::cout << COLOR_PURPLE << "new client connected accept = " << this->return_accept << " IP = " << inet_ntoa(client.sin_addr) << "\n" << COLOR_DEFAULT; //@ToDo how to get the client hostname?
+					std::cout << COLOR_GREEN << "new client connected accept = " << this->return_accept << " IP = " << inet_ntoa(client.sin_addr) << "\n" << COLOR_DEFAULT; //@ToDo how to get the client hostname?
 				#endif
 				if (clients_size < MAX_CLIENTS)
 				{
@@ -106,7 +106,7 @@ void	Server::run_server(void)
 				{
 					std::string tmp = ":" + this->server_name + " 519 * :Too many clients on server, try again later\r\n";
 					#if (DEBUG)
-						std::cout << COLOR_PURPLE << "send msg => " << return_accept << COLOR_YELLOW << tmp << COLOR_DEFAULT;
+						std::cout << COLOR_CYAN << "send msg => " << return_accept << COLOR_YELLOW << tmp << COLOR_DEFAULT;
 					#endif
 					send(return_accept, tmp.c_str(), tmp.length(), MSG_DONTWAIT);
 					close(return_accept);

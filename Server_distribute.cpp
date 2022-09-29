@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:22:26 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 18:41:21 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 		if (it->first != sender)
 		{
 			#if (DEBUG)
-				std::cout << COLOR_PURPLE << "send channel msg => " << it->first << " " << client_list.find(it->first)->second.get_nickname() << " [" << COLOR_WHITE << message.get_raw() << COLOR_DEFAULT;
+				std::cout << COLOR_CYAN << "send channel msg => " << it->first << " " << client_list.find(it->first)->second.get_nickname() << " [" << COLOR_WHITE << message.get_raw() << COLOR_DEFAULT;
 			#endif
 			send(it->first, message.get_raw(), message.get_len(), MSG_DONTWAIT);
 		}
@@ -52,7 +52,7 @@ void	Server::send_channel_message(Channel const & channel, Message const & messa
 void	Server::send_message(Message const & message)
 {
 	#if (DEBUG)
-		std::cout << COLOR_PURPLE << "send msg => " << message.get_fd() << " " << client_list.find(message.get_fd())->second.get_nickname() << " [" << COLOR_WHITE << message.get_raw() << COLOR_DEFAULT;
+		std::cout << COLOR_CYAN << "send msg => " << message.get_fd() << " " << client_list.find(message.get_fd())->second.get_nickname() << " [" << COLOR_WHITE << message.get_raw() << COLOR_DEFAULT;
 	#endif
 	send(message.get_fd(), message.get_raw(), message.get_len(), MSG_DONTWAIT);
 }

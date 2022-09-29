@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 14:01:42 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 15:44:05 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	Server::collect_messages(void)
 	char buffer[BUFFER_SIZE] = {0};
 	ssize_t recv_size = 0;
 
-	for (int i = 0; i < clients_size; ++i)
+	for (int i = 1; i < clients_size; ++i)
 	{
 		if ((clients_pollfd[i].revents & POLLIN) == POLLIN)
 		{
@@ -26,7 +26,7 @@ void	Server::collect_messages(void)
 			{
 				this->client_list.erase(clients_pollfd[i].fd);
 				close(clients_pollfd[i].fd);
-				std::cout << "client disconnected\n";
+				std::cout << clients_pollfd[i].fd << " client disconnected\n";
 				continue;
 			}
 			buffer[recv_size] = '\0';
@@ -59,7 +59,10 @@ void	Server::store_message(int const & fd, char const * input)
 		{
 			that_client.append_message_buffer(tmp.substr(0, end_pos));
 			tmp.erase(0, end_pos + 2);
-			received_message_queue.push(Message(fd, that_client.get_message_buffer()));
+			if (that_client.get_succesfully_reg() == true)
+				received_message_queue.push(Message(fd, that_client.get_message_buffer()));
+			else
+				new_users_message_queue.push(Message(fd, that_client.get_message_buffer()));
 			that_client.clear_message_buffer();
 		}
 	} while (end_pos != std::string::npos);

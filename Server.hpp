@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 12:28:58 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 15:42:20 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ class Server{
 		Server(Server const & other);
 		Server & operator=(Server const & rhs);
 
+		static const int		MAX_CLIENTS = 64;
+		static const ssize_t	BUFFER_SIZE = 1024;
+
 		std::string				server_name;
 		std::string				password;
 		std::string				hostname;
@@ -62,23 +65,20 @@ class Server{
 		std::string				motd;
 		struct sockaddr_in		server_address;
 		struct sockaddr_in		client;
-		struct pollfd			clients_pollfd[64];
+		struct pollfd			clients_pollfd[MAX_CLIENTS];
 		socklen_t				client_number;
-		int						serverSocket;
+		int						server_socket;
 		int						clients_size;
-		int						returnAccept;
+		int						return_accept;
 		int						port;
 
 		std::map<int, Client>	client_list;
 
+		std::queue<Message>		new_users_message_queue;
 		std::queue<Message>		received_message_queue;
 		std::queue<Message>		send_message_queue;
 
 		std::map<std::string, Channel> channel_list;
-
-	
-		static const ssize_t	BUFFER_SIZE = 1024;
-
 
 		int		return_error(std::string const & error_text);
 
@@ -109,6 +109,7 @@ class Server{
 		
 		int		check_args(Message const & message, size_t const & args_count);
 		int		check_authentication(int const & client_fd);
+		int		check_registration(int const & client_fd);
 		int		check_channel(int const & fd, std::string const & channel_name);
 		int		check_user_in_channel(int const & fd, std::string const & channel_name);
 		int		check_client(int const & sender_fd, std::string const & check_nick);

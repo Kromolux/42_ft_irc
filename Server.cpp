@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 12:31:34 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 15:30:55 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,62 +46,68 @@ int	Server::return_error(std::string const & error_text)
 
 int	Server::init_server(void)
 {
-	this->clients_size = 0;
+	this->clients_size = 1;
 	this->server_address.sin_family = AF_INET;
 	this->server_address.sin_addr.s_addr = INADDR_ANY;
 	this->server_address.sin_port = htons(this->port);
 	this->client_number = sizeof(client);
 
-	this->serverSocket = socket(server_address.sin_family, SOCK_STREAM, 0);
+	this->server_socket = socket(server_address.sin_family, SOCK_STREAM, 0);
 
-	if (serverSocket < 0)
+	if (server_socket < 0)
 		return ( return_error("socket returned ") );
 
 	int enable = 1;
 	//@ToDo figure out how to realy reuse address and port after closing/crash
-	if ( setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0 )
+	if ( setsockopt(this->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0 )
 		return ( return_error("setsockopt returned ") );
 
-	if ( setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0 )
+	if ( setsockopt(this->server_socket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0 )
 		return ( return_error("setsockopt returned ") );
 
-	if ( bind(this->serverSocket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0 )
+	if ( bind(this->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0 )
 		return ( return_error("bind returned ") );
 
-	if ( fcntl(this->serverSocket, F_SETFL, O_NONBLOCK ) < 0 )
-		return ( return_error("fcntl returned ") );
+	//if ( fcntl(this->server_socket, F_SETFL, O_NONBLOCK ) < 0 )
+	//	return ( return_error("fcntl returned ") );
 
-	if ( listen(this->serverSocket, 5) < 0 )
+	if ( listen(this->server_socket, 5) < 0 )
 		return ( return_error("listen returned ") );
 
+	update_pollfd();
 	return ( EXIT_SUCCESS );
 }
 
+
 void	Server::run_server(void)
 {
-		this->returnAccept = accept(this->serverSocket, (struct sockaddr *) &client, &client_number);
-		if (this->returnAccept > 0)
-		{
-			std::cout << "accept = " << returnAccept << " client = " << inet_ntoa(client.sin_addr) << "\n"; //@ToDo how to get the client hostname?
-			std::map<int, Client>::iterator client_it;
-			client_it = (client_list.insert(std::make_pair(returnAccept, Client(returnAccept)))).first;
-			client_it->second.set_hostname(std::string(inet_ntoa(client.sin_addr)));
-			this->update_pollfd();
-		}
 
-		if (poll(clients_pollfd, clients_size, 0) > 0)
+	if (poll(clients_pollfd, clients_size, 0) > 0)
+	{
+		if (clients_pollfd[0].revents == POLLIN)
 		{
-			std::cout << "===< collect messages >===\n";
-			this->collect_messages();
-			std::cout << "===< process messages >===\n";
-			this->process_messages();
-			std::cout << "===< distribute messages >===\n";
-			this->distribute_messages();
-			std::cout << "===< wait for new messages >===\n";
-			if (clients_size != static_cast<int>(client_list.size()))
-				this->update_pollfd();
+			this->return_accept = accept(this->server_socket, (struct sockaddr *) &client, &client_number);
+			if (this->return_accept > 0)
+			{
+				std::cout << "accept = " << this->return_accept << " client = " << inet_ntoa(client.sin_addr) << "\n"; //@ToDo how to get the client hostname?
+				std::map<int, Client>::iterator client_it;
+				client_it = (client_list.insert(std::make_pair(this->return_accept, Client(this->return_accept)))).first;
+				client_it->second.set_hostname(std::string(inet_ntoa(client.sin_addr)));
+				update_pollfd();
+			}
 		}
+		std::cout << "===< collect messages >===\n";
+		this->collect_messages();
+		std::cout << "===< process messages >===\n";
+		this->process_messages();
+		std::cout << "===< distribute messages >===\n";
+		this->distribute_messages();
+		std::cout << "===< wait for new messages >===\n";
+		if (clients_size != static_cast<int>(client_list.size()))
+			update_pollfd();
+	}
 }
+
 
 void	Server::stop_server(void)
 {
@@ -112,8 +118,13 @@ void	Server::stop_server(void)
 void	Server::update_pollfd(void)
 {
 	std::map<int, Client>::iterator it = client_list.begin();
-	clients_size = static_cast<int>(client_list.size());
-	for (int i = 0; i < clients_size; ++i, ++it)
+	clients_size = static_cast<int>(client_list.size()) + 1;
+	
+	clients_pollfd[0].fd = this->server_socket;
+	clients_pollfd[0].events = POLLIN;
+	clients_pollfd[0].revents = 0;
+
+	for (int i = 1; i < clients_size; ++i, ++it)
 	{
 		clients_pollfd[i].fd = it->first;
 		clients_pollfd[i].events = POLLIN;

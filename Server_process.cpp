@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 14:00:53 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/29 16:03:19 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	Server::process_messages(void)
 {
 	int	const CMDS_SIZE = 31;
 	bool		executed_cmd = false;
+	std::string cmd;
 
 	std::string const CMDS[CMDS_SIZE] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "PING", "AWAY", "PART", \
 	"WHOIS", "WHO", "WHOWAS", "NAMES", "MOTD", "RULES", "LUSERS", "MAP", "QUIT", "VERSION", "STATS", \
@@ -34,11 +35,37 @@ void	Server::process_messages(void)
 		process_message.parse();
 		process_message.print_message();
 		executed_cmd = false;
+		cmd = process_message.get_cmd();
 
-		if (process_message.get_cmd() == "PASS" || check_authentication(process_message.get_fd()) == EXIT_SUCCESS)
+		for (int ii = 0; ii < CMDS_SIZE; ++ii)
 		{
+			if (process_message.get_cmd() == CMDS[ii])
+			{
+				(this->*func[ii])(process_message);
+				executed_cmd = true;
+				break;
+			}
+		}
 
-			for (int ii = 0; ii < CMDS_SIZE; ++ii)
+		if (executed_cmd == false)
+			server_code_nick_text_message(process_message.get_fd(), "421", process_message.get_cmd(), "Unknown command!");
+
+		received_message_queue.pop();
+	}
+
+	for (int i = 0, end = new_users_message_queue.size(); i < end; ++i)
+	{
+		Message & process_message = new_users_message_queue.front();
+		process_message.parse();
+		process_message.print_message();
+		executed_cmd = false;
+		cmd = process_message.get_cmd();
+		//user registered allow every cmd
+		//if not only NICK and USER
+		//user not authenticated only PASS is allowed cmd
+		if (cmd == "PASS" || check_authentication(process_message.get_fd()) == EXIT_SUCCESS)
+		{
+			for (int ii = 0; ii < 3; ++ii)
 			{
 				if (process_message.get_cmd() == CMDS[ii])
 				{
@@ -49,10 +76,10 @@ void	Server::process_messages(void)
 			}
 
 			if (executed_cmd == false)
-				server_code_nick_text_message(process_message.get_fd(), "421", process_message.get_cmd(), "Unknown command!");
-
+				server_code_nick_text_message(process_message.get_fd(), "451", "*", "You have not registered");
+				//server_code_nick_text_message(process_message.get_fd(), "421", process_message.get_cmd(), "Unknown command!");
 		}
-		received_message_queue.pop();
+		new_users_message_queue.pop();
 	}
 }
 
@@ -137,6 +164,22 @@ int	Server::check_authentication(int const & client_fd)
 		return (EXIT_FAILURE);
 
 	if (client_it->second.get_authenticated() == false)
+	{
+		server_code_nick_text_message(client_fd, "451", "*", "You have not registered");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+
+int	Server::check_registration(int const & client_fd)
+{
+	std::map<int, Client>::iterator client_it = client_list.find(client_fd);
+
+	if (client_it == client_list.end())
+		return (EXIT_FAILURE);
+
+	if (client_it->second.get_succesfully_reg() == false)
 	{
 		server_code_nick_text_message(client_fd, "451", "*", "You have not registered");
 		return (EXIT_FAILURE);

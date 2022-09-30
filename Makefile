@@ -6,7 +6,7 @@
 #    By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/29 18:32:53 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/09/30 17:18:43 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,8 @@ SRCS		:=	main.cpp \
 				Server_cmds.cpp \
 				Server_collect.cpp \
 				Server_process.cpp \
-				Server_distribute.cpp
+				Server_distribute.cpp \
+				Server_ircbot.cpp
 
 OBJS		:=	$(SRCS:%.cpp=%.o)
 

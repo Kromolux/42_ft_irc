@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:00:38 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/30 17:46:23 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 
 #include <map>
 #include <queue>
+#include <vector>
 
 #include "Client.hpp"
 #include "Message.hpp"
@@ -157,6 +158,12 @@ class Server{
 		void	not_implemented_yes(Message const & message);
 		
 		void	PRIVMSG_NOTICE(Message const & message, std::string const & type);
+
+		//ircbot
+		void	ircbot_populate_reply_map(void);
+		void	ircbot_msg(Message const & message);
+
+		std::map<std::string, std::vector<std::string> > ircbot_reply_map;
 };
 
 template <typename T>

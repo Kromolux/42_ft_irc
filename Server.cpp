@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:42:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/30 18:14:09 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ int	Server::init_server(void)
 		return ( return_error("listen returned ") );
 
 	update_pollfd();
+	ircbot_populate_reply_map();
 	return ( EXIT_SUCCESS );
 }
 

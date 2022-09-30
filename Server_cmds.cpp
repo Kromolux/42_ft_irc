@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 16:59:18 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/09/30 17:40:49 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -579,7 +579,10 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 		std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_or_nick);
 		if (channel_it->second.is_channel_inside_only() == true && check_client_in_channel(fd, channel_or_nick) == EXIT_FAILURE)
 			return ;
+		
 		nick_user_host_message(fd, type + " " +  channel_or_nick, message.get_postfix(), channel_or_nick);
+		
+		ircbot_msg(message);
 		return ;
 	}
 	

@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/30 17:40:49 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:20:40 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -582,7 +582,7 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 		
 		nick_user_host_message(fd, type + " " +  channel_or_nick, message.get_postfix(), channel_or_nick);
 		
-		ircbot_msg(message);
+		bot_msg(message);
 		return ;
 	}
 	

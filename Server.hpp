@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/30 17:46:23 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:17:56 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,10 +160,11 @@ class Server{
 		void	PRIVMSG_NOTICE(Message const & message, std::string const & type);
 
 		//ircbot
-		void	ircbot_populate_reply_map(void);
-		void	ircbot_msg(Message const & message);
+		void	bot_populate_reply_map(void);
+		void	bot_msg(Message const & message);
 
-		std::map<std::string, std::vector<std::string> > ircbot_reply_map;
+		std::map<std::string, std::vector<std::string> > bot_reply_map;
+		size_t	bot_reply;
 };
 
 template <typename T>

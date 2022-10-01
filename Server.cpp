@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/30 18:14:09 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:20:16 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ Server::Server(int const & port, char const * password)
 	this->version = "ver. 0.0.1";
 	this->user_modes = "i";
 	this->channel_modes = "oitnb";
+	this->bot_reply = 0;
 }
 
 Server::Server(Server const & other) :hostname(other.hostname)
@@ -78,7 +79,7 @@ int	Server::init_server(void)
 		return ( return_error("listen returned ") );
 
 	update_pollfd();
-	ircbot_populate_reply_map();
+	bot_populate_reply_map();
 	return ( EXIT_SUCCESS );
 }
 

@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:22:50 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/01 14:23:10 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,9 @@ void	Server::process_messages(void)
 	{
 		Message & process_message = new_users_message_queue.front();
 		process_message.parse();
-		process_message.print_message();
+		#if (DEBUG)
+			process_message.print_message();
+		#endif
 		executed_cmd = false;
 		cmd = process_message.get_cmd();
 		//user registered allow every cmd

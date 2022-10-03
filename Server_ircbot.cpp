@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/30 17:16:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 15:03:55 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/01 15:10:04 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,12 @@ void	Server::bot_populate_reply_map(void)
 		bot_response.push_back("I have no watch. Maybe look at the taskbar.");
 		bot_response.push_back("It is later then bevore.");
 		bot_response.push_back("Time to go to sleep.");
+	}
+	{
+		std::vector<std::string> & bot_response	= (this->bot_reply_map.insert( std::make_pair( "ping", std::vector<std::string>() ) ).first->second);
+		bot_response.push_back("Pong...");
+		bot_response.push_back("PONG.");
+		bot_response.push_back("POOOOONNNNG");
 	}
 }
 

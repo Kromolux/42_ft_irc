@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_ircbot.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/30 17:16:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 15:10:04 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:27:22 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,4 +88,3 @@ void	Server::bot_msg(Message const & message)
 		send_message_queue.push(Message(1, msg, channel_name));
 	}
 }
-

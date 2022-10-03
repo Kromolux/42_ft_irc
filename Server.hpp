@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:18:19 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:41:05 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 
 #include <errno.h>
 
-//#include <stdio.h>
 #include <cstdlib>
 
 #include <iostream>
@@ -50,7 +49,15 @@
 	6	can change the channel to invite only MODE <channel> +i ; MODE <channel> -i
 	7	can change the channel flag 't', so that everyone can change the topic MODE <channel> -t MODE <channel> +t
 	8	can change the channel flag 'n', so that everyone from outside the channel can send msg to the channel members MODE <channel> -n MODE <channel> +n
+
+	bot commands
+	1	hello
+	2	weather
+	3	joke
+	4	time
+	5	ping
 */
+		extern bool server_run;
 
 class Server{
 	
@@ -68,11 +75,13 @@ class Server{
 		Server(Server const & other);
 		Server & operator=(Server const & rhs);
 
+
 		static const int		MAX_CLIENTS = 64;
 		static const ssize_t	BUFFER_SIZE = 1024;
 
 		std::string				server_name;
 		std::string				password;
+		std::string				operator_password;
 		std::string				hostname;
 		std::string				version;
 		std::string				user_modes;
@@ -169,6 +178,7 @@ class Server{
 		void	SILENCE(Message const & message);
 		void	TOPIC(Message const & message);
 		void	ISON(Message const & message);
+		void	DIE(Message const & message);
 		
 		void	not_implemented_yes(Message const & message);
 		

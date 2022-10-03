@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 15:23:14 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:37:25 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Server::Server(int const & port, char const * password)
 	this->user_modes = "i";
 	this->channel_modes = "oitnb";
 	this->bot_reply = 0;
+	this->operator_password = "ehosu&rkaufman";
 }
 
 Server::Server(Server const & other) :hostname(other.hostname)

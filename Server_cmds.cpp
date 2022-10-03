@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:17:41 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:45:01 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -545,7 +545,7 @@ void	Server::PRIVMSG_NOTICE(Message const & message, std::string const & type)
 	int	const &			fd = message.get_fd();
 	std::string	const &	channel_or_nick = message.get_args().at(0);
 
-	if (channel_or_nick[0] == '#')
+	if (channel_or_nick[0] == '#' || channel_or_nick[0] == '&')
 	{
 		if (check_channel_exists(message.get_fd(), channel_or_nick) == EXIT_FAILURE)
 			return ;
@@ -615,4 +615,13 @@ void	Server::ISON(Message const & message)
 	}
 	
 	server_code_nick_text_message(fd, "303", "", nick_names);
+}
+
+void	Server::DIE(Message const & message)
+{
+	if (message.get_args().size() == 0)
+		return ;
+
+	if (message.get_args().at(0) == this->operator_password)
+		server_run = false;
 }

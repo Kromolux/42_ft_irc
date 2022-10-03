@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:21:47 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:42:19 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,20 @@
 
 void	Server::process_messages(void)
 {
-	int	const CMDS_SIZE = 32;
+	int	const CMDS_SIZE = 33;
 	bool		executed_cmd = false;
 	std::string cmd;
 
 	std::string const CMDS[CMDS_SIZE] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "PING", "AWAY", "PART", \
 	"WHOIS", "WHO", "WHOWAS", "NAMES", "MOTD", "RULES", "LUSERS", "MAP", "QUIT", "VERSION", "STATS", \
-	"LINKS", "ADMIN", "INVITE", "KICK", "LIST", "NOTICE", "KNOCK", "SETNAME", "MODE", "SILENCE", "PONG", "TOPIC", "ISON"};
+	"LINKS", "ADMIN", "INVITE", "KICK", "LIST", "NOTICE", "KNOCK", "SETNAME", "MODE", "SILENCE", "PONG", "TOPIC", "ISON", "DIE"};
 
 	void	(Server::*func[CMDS_SIZE])(Message const &) = \
 	{&Server::PASS, &Server::NICK, &Server::USER, &Server::JOIN, &Server::PRIVMSG, &Server::PING, &Server::AWAY, &Server::PART, \
 	&Server::WHOIS, &Server::WHO, &Server::WHOWAS, &Server::NAMES, &Server::MOTD, &Server::RULES, &Server::LUSERS, \
 	&Server::MAP, &Server::QUIT, &Server::VERSION, &Server::STATS, &Server::LINKS, &Server::ADMIN, &Server::INVITE, \
 	&Server::KICK, &Server::LIST, &Server::NOTICE, &Server::KNOCK, &Server::SETNAME, &Server::MODE, &Server::SILENCE, &Server::PONG, \
-	&Server::TOPIC, &Server::ISON};
+	&Server::TOPIC, &Server::ISON, &Server::DIE};
 
 	for (int i = 0, end = received_message_queue.size(); i < end; ++i)
 	{
@@ -283,7 +283,6 @@ int	Server::check_nick_is_banned(int const & fd, std::string const & channel_nam
 
 int	Server::check_channel_name(int const & fd, std::string const & channel_name)
 {
-	//@ToDo add more validity checks for channel names
 	if (channel_name[0] != '#' && channel_name[0] != '&' && is_invalid_channel_name(channel_name) == true)
 	{
 		server_code_nick_text_message(fd, "479", channel_name, "Illegal channel name");

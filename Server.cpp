@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 14:20:16 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:23:14 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	Server::init_server(void)
 		return ( return_error("socket returned ") );
 
 	int enable = 1;
-	//@ToDo figure out how to realy reuse address and port after closing/crash
+
 	if ( setsockopt(this->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0 )
 		return ( return_error("setsockopt returned ") );
 
@@ -71,9 +71,6 @@ int	Server::init_server(void)
 
 	if ( bind(this->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0 )
 		return ( return_error("bind returned ") );
-
-	//if ( fcntl(this->server_socket, F_SETFL, O_NONBLOCK ) < 0 )
-	//	return ( return_error("fcntl returned ") );
 
 	if ( listen(this->server_socket, 5) < 0 )
 		return ( return_error("listen returned ") );
@@ -95,7 +92,7 @@ void	Server::run_server(void)
 			if (this->return_accept > 0)
 			{
 				#if (DEBUG)
-					std::cout << COLOR_GREEN << "new client connected accept = " << this->return_accept << " IP = " << inet_ntoa(client.sin_addr) << "\n" << COLOR_DEFAULT; //@ToDo how to get the client hostname?
+					std::cout << COLOR_GREEN << "new client connected accept = " << this->return_accept << " IP = " << inet_ntoa(client.sin_addr) << "\n" << COLOR_DEFAULT;
 				#endif
 				if (clients_size < MAX_CLIENTS)
 				{
@@ -158,7 +155,6 @@ void	Server::update_pollfd(void)
 		clients_pollfd[i].events = POLLIN;
 		clients_pollfd[i].revents = 0;
 	}
-	//std::cout << "client size = " << clients_size << "\n";
 }
 
 
@@ -189,17 +185,7 @@ bool	Server::is_nick_available(std::string const & nick)
 	return (!get_client_fd(nick));
 }
 
-/*
-001 "Welcome to the Internet Relay Network <nick>!<user>@<host>"
-002 "Your host is <servername>, running version <ver>"
-003 "This server was created <date>"
-004 "<servername> <version> <available user modes> <available channel modes>"
 
-:42.ft_irc.local 001 Rene :Welcome to the debian Internet Relay Chat Network Rene!Rene@127.0.0.1
-:42.ft_irc.local 002 Rene :Your host is 42.ft_irc.local[0.0.0.0/6667], running version hybrid-1:8.2.26+dfsg.1-1
-:42.ft_irc.local 003 Rene :This server was created September 1 2019 at 11:18:31+0000
-:42.ft_irc.local 004 Rene 42.ft_irc.local hybrid-1:8.2.26+dfsg.1-1 DFGHXRSWabcdefgijklnopqrsuwy bchiklmnoprstuveCILMNORST bkloveIh
-*/
 void	Server::register_client(Message const & message)
 {
 	int fd = message.get_fd();

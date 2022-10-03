@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 11:44:42 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:17:41 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ void	Server::NICK(Message const & message)
 	int	const &			fd = message.get_fd();
 	std::string	const &	nick = message.get_args().at(0);
 
-	//check if nick already exists and throw error message
 	if (is_nick_available(nick))
 	{
 		Client * that_client = get_client_obj(fd);
@@ -93,8 +92,6 @@ void	Server::JOIN(Message const & message)
 	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
-	//@ToDo validity check for channel names
-
 	int	const &			fd = message.get_fd();
 	std::string	const &	channel_name = message.get_args().at(0);
 
@@ -103,7 +100,7 @@ void	Server::JOIN(Message const & message)
 		return ;
 
 	std::string nick = that_client->get_nickname();
-	//:42.ft_irc.local 479 Rene channel :Illegal channel name
+
 	if (check_channel_name(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
@@ -118,6 +115,9 @@ void	Server::JOIN(Message const & message)
 		return ;
 	
 	if (check_invite_only(fd, channel_name, nick) == EXIT_FAILURE)
+		return ;
+
+	if (channel->second.is_client_on_channel(fd) == true)
 		return ;
 
 	channel->second.add_member(fd, nick);
@@ -144,8 +144,6 @@ void	Server::PRIVMSG(Message const & message)
 
 void	Server::PING(Message const & message)
 {
-	// if (check_args_count(message, 1) == EXIT_FAILURE)
-	// 	return ;
 	std::string	arg0;
 	if(message.get_args().size() > 0)
 		arg0 = message.get_args().at(0);
@@ -183,7 +181,6 @@ void	Server::PART(Message const & message)
 	channel_it->second.remove_member(fd);
 	nick_user_host_message(fd, message.get_cmd() + " " + channel_name);
 
-	//if channel is empty remove it from list
 	if (channel_it->second.get_member_list().size() == 0)
 	{
 		channel_list.erase(channel_it);
@@ -267,9 +264,6 @@ void	Server::MAP(Message const & message)
 
 void	Server::QUIT(Message const & message)
 {
-	//TODO: Check if it's doable with no arguments!
-	// if (check_args_count(message, 1) == EXIT_FAILURE)
-	// 	return ;
 	int	const &		fd = message.get_fd();
 	std::string	response = "bye bye";
 	if (message.get_args().size() > 0)
@@ -335,17 +329,16 @@ void	Server::INVITE(Message const & message)
 	if (check_client_is_operator(fd, channel_name) == EXIT_FAILURE)
 		return ;
 
+	if (check_client_already_in_channel(fd, nick_name, channel_name) == EXIT_FAILURE)
+		return ;
+
 	std::string	const &	sender_nick = client_list.find(fd)->second.get_nickname();
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
 	channel_it->second.add_invite(nick_name);
 	nick_user_host_message(fd, "341 " + sender_nick + " " + nick_name + " " + channel_name);
-	//std::map<int, Client>::iterator		it_client = get_client_by_nick(channel_or_nick);
 	std::string tmp = ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " " +  nick_name + " :" + channel_name + "\r\n";
 	send_message_queue.push(Message(get_client_fd(nick_name), tmp));
-	//nick_user_host_message(get_client_fd(nick_name), message.get_cmd() + " " + nick_name, channel_name);
-	//only to channel operators
-	//nick_user_host_message(message.get_fd(), "341 " + sender_nick + " " + nick_name + " " + channel_name, channel_name);
 }
 
 
@@ -387,7 +380,6 @@ void	Server::KICK(Message const & message)
 	nick_user_host_message(fd, message.get_cmd() + " " + channel_name + " " + kicked_nick, reason);
 	std::string tmp = ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " " + channel_name + " " +  kicked_nick + " :" + reason + "\r\n";
 	send_message_queue.push(Message(client_it->first, tmp));
-	//nick_user_host_message(client_it->first, message.get_cmd() + " " + channel_name + " " + kicked_nick, reason);
 	nick_user_host_message(fd, message.get_cmd() + " " + channel_name + " " + kicked_nick, reason, channel_name);
 }
 
@@ -430,30 +422,10 @@ void	Server::SETNAME(Message const & message)
 }
 
 
-/*
-   A user MODE command MUST only be accepted if both the sender of the
-   message and the nickname given as a parameter are both the same.  If
-   no other parameter is given, then the server will return the current
-   settings for the nick.
-
-      The available modes are as follows:
-
-           a - user is flagged as away;
-           i - marks a users as invisible;
-           w - user receives wallops;
-           r - restricted user connection;
-           o - operator flag;
-           O - local operator flag;
-           s - marks a user for receipt of server notices.
-
-   Additional modes may be available later on.
-*/
-
 /* MODE <nickname> {[+|-]|i|w|s|o}
 * MODE <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>] [<ban mask>] */
 void	Server::MODE(Message const & message)
 {
-	//TODO: Check this!
 	if (check_args_count(message, 1) == EXIT_FAILURE)
 		return ;
 
@@ -497,10 +469,9 @@ void	Server::MODE(Message const & message)
 
 			nick_user_host_message(fd, message.get_cmd() + " " + channel_or_nick + " " + flags + " " + nick_name);
 			nick_user_host_message(fd, message.get_cmd() + " " + channel_or_nick + " " + flags + " " + nick_name, "", channel_or_nick);
-			//return ;
+
 		}
 
-		//:42.ft_irc.local 474 rene #42 :Cannot join channel (+b)
 		if (flags.find('b') != std::string::npos && argc > 2)
 		{
 			if (check_nick_exists(fd, message.get_args().at(2)) == EXIT_FAILURE)
@@ -613,7 +584,6 @@ void	Server::TOPIC(Message const & message)
 
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 
-	//if args > 1 then change topic
 	if ( message.get_args().size() > 1 )
 	{
 		if (channel_it->second.is_channel_topic_only() == true)
@@ -626,4 +596,23 @@ void	Server::TOPIC(Message const & message)
 	}
 	
 	nick_user_host_message(fd, message.get_cmd() + " " + channel_name + " ", channel_it->second.get_topic());
+}
+
+
+void	Server::ISON(Message const & message)
+{
+	if (check_args_count(message, 1) == EXIT_FAILURE)
+		return ;
+
+	int	const &			fd = message.get_fd();
+	std::string nick_names;
+
+	
+	for(int i = 0, end = message.get_args().size(); i < end; ++i)
+	{
+		if (get_client_by_nick(message.get_args().at(i)) != client_list.end())
+			nick_names += message.get_args().at(i) + " ";
+	}
+	
+	server_code_nick_text_message(fd, "303", "", nick_names);
 }

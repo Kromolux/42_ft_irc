@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:49:20 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:35:33 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:50:29 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ class Message
 		int const & 		get_fd(void) const;
 		std::string const &	get_prefix(void) const;
 		std::string const &	get_cmd(void) const;
-		std::string const &	get_arg(void) const;
 		std::vector<std::string> const & get_args(void) const;
 		std::string const &	get_postfix(void) const;
 		std::string const &	get_receiver(void) const;

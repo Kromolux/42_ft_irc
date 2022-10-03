@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_distribute.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:07:38 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:41:21 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:46:06 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void	Server::distribute_messages(void)
 	for (int i = 0, end = send_message_queue.size(); i < end; ++i)
 	{
 		Message message_to_send = send_message_queue.front();
-		//message_to_send.print_message();
 		if (message_to_send.receiver_is_channel())
 		{
 			std::map<std::string, Channel>::iterator channel = channel_list.find(message_to_send.get_receiver());

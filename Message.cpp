@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 10:53:12 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 18:39:49 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:00:00 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,18 +55,18 @@ void	Message::parse(void)
 	start_pos = tmp.find_first_not_of(whitespace, 0);
 	end_pos = tmp.find_first_of(whitespace, start_pos);
 	if (start_pos == std::string::npos)
-		return ; //empty message!
-	if (tmp[start_pos] == ':')			//prefix
+		return ;								//empty message!
+	if (tmp[start_pos] == ':')					//prefix
 	{
 		++start_pos;
 		this->prefix = tmp.substr(start_pos, end_pos - start_pos);
 	}
-	else								//cmd
+	else										//cmd
 		this->cmd = tmp.substr(start_pos, end_pos - start_pos);
 	tmp.erase(0, end_pos);
 
 	end_pos = 0;
-	do									//args
+	do											//args
 	{
 		start_pos = tmp.find_first_not_of(whitespace, end_pos);
 		end_pos = tmp.find_first_of(whitespace, start_pos);
@@ -91,18 +91,11 @@ std::string const & Message::get_prefix(void) const
 std::string const & Message::get_cmd(void) const
 { return (this->cmd); }
 
-// std::string const & Message::get_arg(void) const
-// { return (this->arg); }
-
 std::vector<std::string> const & Message::get_args(void) const
 { return (this->args); }
 
-// std::string const & Message::get_postfix(void) const
-// { return (this->postfix); }
-
 std::string const & Message::get_postfix(void) const
 { return (this->args.back()); }
-
 
 std::string const & Message::get_receiver(void) const
 { return (this->receiver); }
@@ -115,7 +108,7 @@ int Message::get_len(void) const
 
 bool	Message::receiver_is_channel(void) const
 {
-	if (receiver[0] == '#')
+	if (receiver[0] == '#' || receiver[0] == '&')
 		return (true);
 	return (false);
 }

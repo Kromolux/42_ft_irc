@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 11:27:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 16:18:19 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,18 @@
 #include "Channel.hpp"
 
 #include "colors.h"
+
+/*
+	channel operator priviliges:
+	1	can change the topic TOPIC <topic>
+	2	can kick a user from the channel KICK <channel> <nick>
+	3	can ban/unban a user from a channel MODE +b <nick> ; MODE -b <nick>
+	4	can send channel invitations to other users INVITE <channel> <nick>
+	5	can grand operator priviliges to other users MODE +o <nick> ; MODE -o <nick>
+	6	can change the channel to invite only MODE <channel> +i ; MODE <channel> -i
+	7	can change the channel flag 't', so that everyone can change the topic MODE <channel> -t MODE <channel> +t
+	8	can change the channel flag 'n', so that everyone from outside the channel can send msg to the channel members MODE <channel> -n MODE <channel> +n
+*/
 
 class Server{
 	
@@ -121,7 +133,9 @@ class Server{
 		int		check_nick_is_banned(int const & fd, std::string const & channel_name, std::string const & nick_name);
 		int		check_channel_name(int const & fd, std::string const & channel_name);
 		int		check_invite_only(int const & fd, std::string const & channel_name, std::string const & nick);
-
+		int		check_client_already_in_channel(int const & fd, std::string const & nick_name, std::string const & channel_name);
+		bool	is_invalid_channel_name(std::string const & channel_name);
+		
 		//commands
 		void	PASS(Message const & message);
 		void	NICK(Message const & message);
@@ -154,6 +168,7 @@ class Server{
 		void	MODE(Message const & message);
 		void	SILENCE(Message const & message);
 		void	TOPIC(Message const & message);
+		void	ISON(Message const & message);
 		
 		void	not_implemented_yes(Message const & message);
 		

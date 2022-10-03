@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 16:23:05 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/29 13:27:49 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:51:31 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ std::string const	Channel::get_member_string_operator(void) const
 	return (tmp);
 }
 
-void				Channel::set_topic(std::string const & input)
+void	Channel::set_topic(std::string const & input)
 { this->topic = input; }
 
 std::string const &	Channel::get_topic(void) const
@@ -160,7 +160,7 @@ void	Channel::set_channel_inside_only(bool const & inside)
 bool	Channel::is_channel_inside_only(void) const
 { return (this->inside_only); }
 
-//itnb
+
 std::string const Channel::get_channel_flags(void) const
 {
 	std::string tmp;

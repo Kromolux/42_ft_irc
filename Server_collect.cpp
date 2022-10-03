@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_collect.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:05:43 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 14:47:42 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 15:46:48 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,7 @@ void	Server::store_message(int const & fd, char const * input)
 
 	do
 	{
-		end_pos = tmp.find("\r\n", 0); // \r || \n || \r\n
-		if (end_pos == std::string::npos)
-		{
-			// end_pos = tmp.find("\r", 0);
-			// if (end_pos == std::string::npos)
-			// 	end_pos = tmp.find("\n", 0);
-		}
+		end_pos = tmp.find("\r\n", 0);
 		
 		if (end_pos == std::string::npos) //incomplete message append to client buffer
 			that_client.append_message_buffer(tmp);

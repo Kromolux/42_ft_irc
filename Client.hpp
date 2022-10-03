@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 16:14:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/09/27 16:22:50 by ehosu            ###   ########.fr       */
+/*   Updated: 2022/10/03 15:51:11 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ class Client
 
 		Client(Client const & other);
 		Client(int const & fd);
-		//Client(std::string const & nickname);
 		~Client(void);
 		
 		bool 		operator<(const Client & rhs) const;

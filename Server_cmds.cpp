@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:45:01 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 18:25:44 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -622,6 +622,8 @@ void	Server::DIE(Message const & message)
 	if (message.get_args().size() == 0)
 		return ;
 
-	if (message.get_args().at(0) == this->operator_password)
-		server_run = false;
+	if (message.get_args().at(0) != this->operator_password)
+		return ;
+
+	server_run = false;
 }

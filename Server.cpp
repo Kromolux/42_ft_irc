@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:37:25 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 18:35:56 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,14 @@ void	Server::run_server(void)
 
 void	Server::stop_server(void)
 {
+	std::string msg;
+
 	for (int i = 0; i < clients_size; ++i)
+	{
+		msg = ":" + this->server_name + " NOTICE " + client_list.find(clients_pollfd[i].fd)->second.get_nickname() + " :Server shutdown!\r\n";
+		send(clients_pollfd[i].fd, msg.c_str(), msg.length(), MSG_DONTWAIT);
 		close(clients_pollfd[i].fd);
+	}
 }
 
 
@@ -183,7 +189,9 @@ Client *Server::get_client_obj(int const & fd)
 
 bool	Server::is_nick_available(std::string const & nick)
 {
-	return (!get_client_fd(nick));
+	if (!get_client_fd(nick) && nick != "ircbot")
+		return (true);
+	return (false);
 }
 
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:04 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 14:17:56 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 11:27:10 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Server{
 		Server(Server const & other);
 		Server & operator=(Server const & rhs);
 
-		static const int		MAX_CLIENTS = 3;
+		static const int		MAX_CLIENTS = 64;
 		static const ssize_t	BUFFER_SIZE = 1024;
 
 		std::string				server_name;

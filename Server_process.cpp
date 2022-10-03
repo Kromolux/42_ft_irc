@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_process.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 14:23:10 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 11:44:35 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,7 @@ int Server::check_nick_in_channel(int const & fd, std::string const & channel_na
 {
 	std::map<std::string, Channel>::iterator channel_it = channel_list.find(channel_name);
 	
-	if (channel_it->second.is_client_on_channel(fd) == false)
+	if (channel_it->second.is_client_on_channel(get_client_fd(nick_name)) == false)
 	{
 		server_code_nick_text_message(fd, "441", nick_name, "Not in channel");
 		return (EXIT_FAILURE);

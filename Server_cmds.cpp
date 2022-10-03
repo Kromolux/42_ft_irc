@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_cmds.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:29:24 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/01 14:20:40 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 11:44:42 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,7 +340,10 @@ void	Server::INVITE(Message const & message)
 
 	channel_it->second.add_invite(nick_name);
 	nick_user_host_message(fd, "341 " + sender_nick + " " + nick_name + " " + channel_name);
-	nick_user_host_message(get_client_fd(nick_name), message.get_cmd() + " " + nick_name, channel_name);
+	//std::map<int, Client>::iterator		it_client = get_client_by_nick(channel_or_nick);
+	std::string tmp = ":" + get_nick_user_host_txt(fd) + " " + message.get_cmd() + " " +  nick_name + " :" + channel_name + "\r\n";
+	send_message_queue.push(Message(get_client_fd(nick_name), tmp));
+	//nick_user_host_message(get_client_fd(nick_name), message.get_cmd() + " " + nick_name, channel_name);
 	//only to channel operators
 	//nick_user_host_message(message.get_fd(), "341 " + sender_nick + " " + nick_name + " " + channel_name, channel_name);
 }
@@ -541,9 +544,9 @@ void	Server::MODE(Message const & message)
 			else
 				channel_it->second.set_channel_inside_only(true);
 
-		}
 			nick_user_host_message(fd, message.get_cmd() + " " + channel_or_nick + " " + flags);
 			nick_user_host_message(fd, message.get_cmd() + " " + channel_or_nick + " " + flags, "", channel_or_nick);
+		}
 		return ;
 	}
 	server_code_nick_text_message(fd, "324", (channel_or_nick + " " + channel_it->second.get_channel_flags()));

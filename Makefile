@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+         #
+#    By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/12 15:48:28 by rkaufman          #+#    #+#              #
-#    Updated: 2022/09/30 17:18:43 by rkaufman         ###   ########.fr        #
+#    Updated: 2022/10/03 11:59:19 by rkaufman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,7 +58,7 @@ fclean: clean
 re: fclean all
 
 val:
-	valgrind --leak-check=full -s ./$(NAME) $(PORT) $(PASS)
+	valgrind --leak-check=full -s --show-leak-kinds=all ./$(NAME) $(PORT) $(PASS)
 
 leak:
 	leaks --atExit -- ./$(NAME) $(PORT) $(PASS)

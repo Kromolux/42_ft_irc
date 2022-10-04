@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/30 17:16:11 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:27:22 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/03 21:38:51 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	Server::bot_populate_reply_map(void)
 		bot_response.push_back("You can ask me almost everything, but I decide if I wanna answer you.");
 		bot_response.push_back("You are repeating yourself!");
 		bot_response.push_back("Try something else please.");
-		bot_response.push_back("You are so boring.");
+		bot_response.push_back("You are so boring. Try something else.");
 		bot_response.push_back("I am still here.");
 	}
 	{
@@ -35,7 +35,7 @@ void	Server::bot_populate_reply_map(void)
 	{
 		std::vector<std::string> & bot_response	= (this->bot_reply_map.insert( std::make_pair( "joke", std::vector<std::string>() ) ).first->second);
 		bot_response.push_back("A foo walks into a bar, takes a look around and says: \"Hello World!\".");
-		bot_response.push_back("Sofware developers like to solve problems. If there are no problems handily available, they will create their on problems!");
+		bot_response.push_back("Sofware developers like to solve problems. If there are no problems handily available, they will create their own problems!");
 		bot_response.push_back("Chuck Norris can take a screenshot of his blue screen!");
 		bot_response.push_back("A programmer is a machine that turns coffee into code.");
 		bot_response.push_back("A programmer is a person who fixed a problem that you don't know you have, in a way you don't understand.");
@@ -48,14 +48,23 @@ void	Server::bot_populate_reply_map(void)
 	{
 		std::vector<std::string> & bot_response	= (this->bot_reply_map.insert( std::make_pair( "time", std::vector<std::string>() ) ).first->second);
 		bot_response.push_back("I have no watch. Maybe look at the taskbar.");
-		bot_response.push_back("It is later then bevore.");
+		bot_response.push_back("It is later then before.");
 		bot_response.push_back("Time to go to sleep.");
+		bot_response.push_back("Time is ticking away.");
+		bot_response.push_back("You have to go home now.");
+		bot_response.push_back("Why you are still here?");
 	}
 	{
 		std::vector<std::string> & bot_response	= (this->bot_reply_map.insert( std::make_pair( "ping", std::vector<std::string>() ) ).first->second);
 		bot_response.push_back("Pong...");
-		bot_response.push_back("PONG.");
-		bot_response.push_back("POOOOONNNNG");
+		bot_response.push_back("PONG...");
+		bot_response.push_back("POOOOONNNNG...");
+	}
+	{
+		std::vector<std::string> & bot_response	= (this->bot_reply_map.insert( std::make_pair( "pong", std::vector<std::string>() ) ).first->second);
+		bot_response.push_back("Ping...");
+		bot_response.push_back("PING...");
+		bot_response.push_back("PIIIINNNNG...");
 	}
 }
 

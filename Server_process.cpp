@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server_process.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ehosu <ehosu@student.42wolfsburg.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 17:06:14 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 16:42:19 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/04 11:26:19 by ehosu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,7 +310,7 @@ bool	Server::is_invalid_channel_name(std::string const & channel_name)
 {
 	char const * channel_char = channel_name.c_str();
 
-	for (; channel_char != '\0'; ++channel_char)
+	for (; *channel_char != '\0'; ++channel_char)
 	{
 		if (std::iscntrl(*channel_char) != 0)
 			return (true);

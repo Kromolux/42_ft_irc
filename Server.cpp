@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rkaufman <rkaufman@student.42wolfsburg.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/04 11:10:48 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/04 13:43:37 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ void	Server::stop_server(void)
 {
 	std::string msg;
 
-	for (int i = 0; i < clients_size; ++i)
+	for (int i = 1; i < clients_size; ++i)
 	{
 		msg = ":" + this->server_name + " NOTICE " + client_list.find(clients_pollfd[i].fd)->second.get_nickname() + " :Server shutdown!\r\n";
 		send(clients_pollfd[i].fd, msg.c_str(), msg.length(), MSG_DONTWAIT);

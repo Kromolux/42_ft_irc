@@ -6,7 +6,7 @@
 /*   By: rkaufman <rkaufman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 15:23:03 by rkaufman          #+#    #+#             */
-/*   Updated: 2022/10/03 18:35:56 by rkaufman         ###   ########.fr       */
+/*   Updated: 2022/10/04 11:10:48 by rkaufman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,10 +198,10 @@ bool	Server::is_nick_available(std::string const & nick)
 void	Server::register_client(Message const & message)
 {
 	int fd = message.get_fd();
-	server_code_nick_text_message(fd, "001", "Welcome to the Internet Relay Chat Network " + get_nick_user_host_txt(fd));
-	server_code_nick_text_message(fd, "002", ("Your host is " + this->server_name + ", running version " + this->version) );
-	server_code_nick_text_message(fd, "003", "This server was created September 2022");
-	server_code_nick_text_message(fd, "004", (this->server_name + " " + this->version + " " + this->user_modes + " " + this->channel_modes) );
+	server_code_nick_text_message(fd, "001", "", "Welcome to the Internet Relay Chat Network " + get_nick_user_host_txt(fd));
+	server_code_nick_text_message(fd, "002", "", ("Your host is " + this->server_name + ", running version " + this->version) );
+	server_code_nick_text_message(fd, "003", "", "This server was created September 2022");
+	server_code_nick_text_message(fd, "004", "", (this->server_name + " " + this->version + " " + this->user_modes + " " + this->channel_modes) );
 	MOTD(message);
 	nick_user_host_message(fd, "MODE " + this->client_list.find(fd)->second.get_nickname(), "+i");
 }
